@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+/*
+ * İnoxhan tasarım tokenları — çelik/metalik hibrit tema.
+ * Koyu bölümler: steel-950/900 zemin. Açık bölümler: steel-50/100 zemin.
+ * Vurgu: metalik gradyan (CTA) + kısık amber `signal` (yalnız mikro vurgular).
+ */
+@theme {
+  --color-steel-50: #f5f7f8;
+  --color-steel-100: #e8ecef;
+  --color-steel-200: #d2d8de;
+  --color-steel-300: #b9c2ca;
+  --color-steel-400: #8b97a3;
+  --color-steel-500: #6e7b88;
+  --color-steel-600: #4a5561;
+  --color-steel-700: #333c46;
+  --color-steel-800: #1f252c;
+  --color-steel-900: #14181d;
+  --color-steel-950: #0b0d10;
+
+  --color-signal: #e8b54a;
+
+  /* Panel durum renkleri (kısık) */
+  --color-status-new: #3b82f6;
+  --color-status-pending: #d97706;
+  --color-status-answered: #16a34a;
+  --color-status-overdue: #dc2626;
+
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --shadow-card: 0 1px 2px rgb(11 13 16 / 0.06), 0 4px 12px rgb(11 13 16 / 0.05);
+  --shadow-elevated: 0 8px 30px rgb(11 13 16 / 0.12);
+
+  --animate-sheen: sheen 2.6s ease-in-out infinite;
+
+  @keyframes sheen {
+    0%,
+    60% {
+      transform: translateX(-120%) skewX(-18deg);
+    }
+    100% {
+      transform: translateX(220%) skewX(-18deg);
+    }
+  }
+}
+
+/* Fırçalanmış inox CTA gradyanı — üzerine koyu metin */
+@utility gradient-steel {
+  background-image: linear-gradient(
+    135deg,
+    #eaecef 0%,
+    #aeb6c0 45%,
+    #dde1e6 70%,
+    #9aa2ac 100%
+  );
+}
+
+/* Koyu krom yüzey gradyanı — koyu kartlar için */
+@utility gradient-chrome-dark {
+  background-image: linear-gradient(160deg, #3a4048, #1a1e23 60%, #2b3037);
+}
+
+/* Bölüm geçişlerinde ince metalik ayraç çizgisi */
+@utility divider-inox {
+  height: 1px;
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    #9aa2ac 20%,
+    #eaecef 50%,
+    #9aa2ac 80%,
+    transparent
+  );
+  opacity: 0.5;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-steel-50);
+  color: var(--color-steel-900);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-steel-800);
+  color: var(--color-steel-50);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-steel-500);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

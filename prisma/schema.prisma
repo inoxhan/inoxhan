@@ -1,0 +1,146 @@
+// İnoxhan — teklif toplama odaklı ürün kataloğu veri modeli
+// SQLite (dev) → Postgres (prod, VPS). SQLite kısıtları: enum yok (String + zod),
+// Json yerine String (JSON.stringify) kullanılır.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  order     Int       @default(0)
+  imagePath String?
+  products  Product[]
+}
+
+model Brand {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  slug     String    @unique
+  products Product[]
+}
+
+model Product {
+  id         String            @id @default(cuid())
+  sku        String            @unique
+  name       String
+  slug       String            @unique
+  model      String?
+  shortDesc  String?
+  useAreas   String?           // "İnşaat, Mobilya, Tesisat" — virgüllü liste
+  seoTitle   String?
+  seoDesc    String?
+  isActive   Boolean           @default(true)
+  categoryId String
+  brandId    String?
+  category   Category          @relation(fields: [categoryId], references: [id])
+  brand      Brand?            @relation(fields: [brandId], references: [id])
+  specs      ProductSpec[]
+  images     ProductImage[]
+  documents  ProductDocument[]
+  quoteItems QuoteItem[]
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  @@index([categoryId])
+  @@index([brandId])
+}
+
+model ProductSpec {
+  id        String  @id @default(cuid())
+  productId String
+  key       String // "Malzeme", "Ölçü", "Kaplama", "Norm"
+  value     String // "A2 Paslanmaz", "M8x40", "DIN 933"
+  order     Int     @default(0)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([key, value])
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  basePath  String // "media/products/inx-cv-0001" → -sm/-md/-lg .avif/.webp türevleri
+  alt       String
+  isMain    Boolean @default(false)
+  order     Int     @default(0)
+  width     Int
+  height    Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+}
+
+model ProductDocument {
+  id        String  @id @default(cuid())
+  productId String
+  title     String // "Teknik Föy (PDF)"
+  filePath  String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Customer {
+  id        String         @id @default(cuid())
+  name      String
+  company   String?
+  phone     String         @unique // normalize +905XXXXXXXXX — tekilleştirme anahtarı
+  email     String?
+  createdAt DateTime       @default(now())
+  quotes    QuoteRequest[]
+}
+
+model QuoteRequest {
+  id             String      @id @default(cuid())
+  status         String      @default("YENI") // YENI | BEKLEYEN | CEVAPLANAN (zod korumalı)
+  note           String?
+  attachmentPath String? // "bana bu ürün lazım" fotoğrafı (özel depolama)
+  source         String      @default("form") // form | product | hero | floating
+  customerId     String
+  customer       Customer    @relation(fields: [customerId], references: [id])
+  items          QuoteItem[]
+  createdAt      DateTime    @default(now()) // geçen süre sayacının kaynağı
+  respondedAt    DateTime?
+
+  @@index([status, createdAt])
+}
+
+model QuoteItem {
+  id             String       @id @default(cuid())
+  quoteRequestId String
+  productId      String? // null = serbest metin talep
+  freeText       String? // "8'lik dübel, siyah"
+  quantity       Int          @default(1)
+  unit           String       @default("adet") // adet | kutu | paket
+  quoteRequest   QuoteRequest @relation(fields: [quoteRequestId], references: [id], onDelete: Cascade)
+  product        Product?     @relation(fields: [productId], references: [id])
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  type      String // constants.ts EVENT_TYPES
+  payload   String   @default("{}") // JSON string (SQLite uyumu)
+  sessionId String? // anonim cookie id
+  path      String?
+  createdAt DateTime @default(now())
+
+  @@index([type, createdAt])
+}
+
+model AdminUser {
+  id           String @id @default(cuid())
+  username     String @unique
+  passwordHash String // scrypt$N$salt$hash
+}
+
+model Setting {
+  key   String @id // notify_email | whatsapp_number | crm_webhook_url | crm_webhook_secret | hero_slogan
+  value String
+}
