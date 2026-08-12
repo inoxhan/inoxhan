@@ -19,14 +19,20 @@ export interface ProductCardData {
  */
 export function ProductCard({ product }: { product: ProductCardData }) {
   const detailHref = `/urunler/${product.categorySlug}/${product.slug}`;
+  const subtitle = [product.brand, product.model].filter(Boolean).join(" · ");
 
   return (
     <article className="group flex flex-col overflow-hidden rounded-lg border border-steel-200 bg-white shadow-card transition-shadow hover:shadow-elevated">
-      <Link href={detailHref} className="relative block aspect-[4/3] overflow-hidden bg-steel-100">
+      {/* Ürün fotoğrafları siyah zeminde çekildi: koyu tile'a kusursuz karışır,
+          contain ile ürünün tamamı görünür (oranlar üründen ürüne değişiyor). */}
+      <Link
+        href={detailHref}
+        className="relative block aspect-[4/3] overflow-hidden bg-photo"
+      >
         <ProductImage
           basePath={product.image}
           alt={product.name}
-          className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+          className="size-full object-contain transition-transform duration-500 group-hover:scale-[1.06]"
         />
       </Link>
 
@@ -37,10 +43,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             {product.name}
           </h3>
         </Link>
-        <p className="mt-1 text-sm text-steel-500">
-          {product.brand}
-          {product.model ? ` · ${product.model}` : ""}
-        </p>
+        {subtitle && <p className="mt-1 text-sm text-steel-500">{subtitle}</p>}
 
         {product.specs.length > 0 && (
           <dl className="mt-3 space-y-1 border-t border-steel-100 pt-3 text-sm">

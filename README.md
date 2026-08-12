@@ -1,8 +1,13 @@
 # İnoxhan — Hızlı Teklif Sitesi
 
-Hırdavat / bağlantı elemanları için teklif toplama odaklı kurumsal site.
+Paslanmaz çelik bağlantı elemanları için teklif toplama odaklı kurumsal site.
 E-ticaret değildir: **fiyat gösterilmez**, tüm akış "Teklif Al"a çıkar.
 Vaat: **"İhtiyacını gönder, en geç 1 saat içinde teklifini al."**
+
+Katalog 54 ürün / 8 kategori içerir; tüm ürünler DIN veya ISO normuna sahiptir ve
+**A2 (AISI 304)** ile **A4 (AISI 316)** kalitelerde sunulur. Ürün kodu = norm kodu
+(`DIN 933`, `ISO 7380`). Müşteri kaliteyi ürün sayfasından seçer; seçim teklif
+formuna, e-postaya, panele ve CRM webhook'una taşınır.
 
 ## Teknoloji
 
@@ -24,18 +29,40 @@ Panel: `/panel` — kullanıcı adı ve şifre `.env` içinde (`ADMIN_USERNAME` 
 İlk kurulumda `.env.example`'ı `.env` olarak kopyalayıp doldurun; `SESSION_SECRET`,
 `ADMIN_PASSWORD` ve `CATALOG_PRINT_TOKEN` rastgele üretilmelidir.
 
-## Gerçek ürün verisini içe aktarma (456 ürün)
+## Ürün verisi
 
-1. Excel dosyasını `import\urunler.xlsx` olarak koyun
-   (örnek biçim: mevcut `import\urunler.xlsx` — kolonlar: Ürün Kodu, Ürün Adı, Kategori,
-   Marka, Model, Kısa Açıklama, Kullanım Alanları, Teknik Özellik 1..N).
-   Kolon adları farklıysa `scripts/import-excel.ts` başındaki `COLUMNS` haritasını uyarlayın.
-2. Fotoğrafları `import\fotograflar\` içine koyun. Dosya adında ürün kodu (SKU) geçiyorsa
-   doğrudan eşleşir; geçmiyorsa ürün adına benzerlikle eşlenir.
-3. Çalıştırın: `npm run import` (önizleme: `npm run import -- --dry`)
-4. Eşleşmeyenleri kontrol edin: `import\eslesmeyen.csv`
-   (dosyaları yeniden adlandırıp `npm run import` tekrar çalıştırılabilir — güvenlidir,
-   SKU üzerinden günceller, kopya oluşturmaz).
+Ürünlerin **tamamı fotoğraf klasöründen** üretilir; ayrı bir Excel gerekmez. Kaynak:
+`resimler ve açıklamalar\` (git'e dahil değildir, ~70 MB).
+
+Dosya adı biçimi — tüm bilgi buradan okunur:
+
+```
+21 - INOX ALTIKÖŞE BAŞLI METRİK DİŞ TAM PASO CIVATA - DIN 933 - ISO 4017.png
+05 - INOX YAYLI RONDELA - DIN 127 B.png            → sadece DIN
+39 - INOX BOMBE BAŞLI İMBUS CIVATA - ISO 7380.png  → sadece ISO
+52 - INOX ÇAKMA DÜBEL - DROP IN ANCHOR.png         → norm yok, global İngilizce ad
+```
+
+Ürün kodu DIN'den, yoksa ISO'dan, o da yoksa global İngilizce addan üretilir.
+Teknik özellik olarak yalnızca **dosya adındaki norm bilgisi + paslanmaz malzeme +
+A2/A4 kalite** yazılır; ölçü ve kullanım alanı gibi alanlar bilinçli olarak **boş bırakılır**
+(panelden doldurulur — sistem asla veri uydurmaz).
+
+```bash
+npm run import:urunler -- --dry   # önizleme, veritabanına yazmaz
+npm run import:urunler            # içe aktar (SKU ile upsert, tekrarı güvenli)
+npm run import:urunler -- --force # görsel türevlerini yeniden üret
+```
+
+**Yeni ürün grubu eklemek:** fotoğrafları aynı adlandırmayla bir klasöre koyun, klasör adını
+`scripts/import-urunler.ts` içindeki `SOURCE_DIRS` listesine ve dosya numaralarını `CATEGORIES`
+tablosuna ekleyin, script'i tekrar çalıştırın. Kategori tablosunda karşılığı olmayan dosya
+varsa script yazmadan önce uyarır.
+
+**Sıfırdan başlatmak:** `npm run temizle -- --yes` (ürünler, kategoriler, talepler ve medya
+silinir; panel kullanıcısı ile ayarlar korunur), ardından `npm run import:urunler`.
+
+Elde Excel varsa alternatif hat: `npm run import:excel` (bkz. `scripts/import-excel.ts`).
 
 ## PDF katalog
 

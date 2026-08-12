@@ -42,8 +42,8 @@ export function TrustMetrics({ productCount }: { productCount: number }) {
 
   const items = [
     { big: "≤ 1 Saat", label: "Maksimum teklif dönüş hedefi" },
-    { big: `${counted}+`, label: "Ürün" },
-    { big: "Hızlı", label: "Teklif süreci — dakikalar içinde talep" },
+    { big: `${counted}`, label: "DIN / ISO normunda ürün" },
+    { big: "A2 · A4", label: "Paslanmaz kalite seçeneği" },
     { big: "Uzman", label: "Ürün desteği" },
   ];
 

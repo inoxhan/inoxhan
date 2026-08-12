@@ -59,6 +59,7 @@ export default async function KatalogBaskiPage({
   const withProducts = categories.filter((c) => c.products.length > 0);
   const totalProducts = withProducts.reduce((n, c) => n + c.products.length, 0);
   const year = new Date().getFullYear();
+  const coverImage = withProducts[0]?.products[0]?.images[0]?.basePath ?? null;
 
   // Her ürün için QR (data URL) — ürünün web sayfasına gider
   const qrMap = new Map<string, string>();
@@ -94,7 +95,20 @@ export default async function KatalogBaskiPage({
           <p style={{ marginTop: "10mm", fontSize: "13pt", color: "#B9C2CA", maxWidth: "120mm" }}>
             {SITE.tagline}
           </p>
+          <p style={{ marginTop: "4mm", fontSize: "11pt", color: "#6E7B88", maxWidth: "120mm" }}>
+            Paslanmaz çelik bağlantı elemanları · DIN / ISO normları · A2 ve A4 kalite
+          </p>
         </div>
+
+        {/* Kapak görseli — kataloğun ilk kategorisinden temsili ürün */}
+        {coverImage && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={`/${coverImage}-lg.webp`}
+            alt=""
+            style={{ width: "135mm", alignSelf: "flex-end" }}
+          />
+        )}
         <div style={{ borderTop: "0.5pt solid #333C46", paddingTop: "6mm", display: "flex", justifyContent: "space-between", fontSize: "9.5pt", color: "#8B97A3" }}>
           <span>{totalProducts} ürün · {withProducts.length} kategori</span>
           <span>{SITE.url.replace(/^https?:\/\//, "")}</span>
@@ -160,11 +174,20 @@ export default async function KatalogBaskiPage({
             >
               <div style={{ width: "42mm", flexShrink: 0 }}>
                 {p.images[0] ? (
+                  // Fotoğraflar siyah zeminli: koyu kutu içinde contain ile basılır
                   // eslint-disable-next-line @next/next/no-img-element
+                  // 42mm @300dpi ≈ 500px → -sm (480w) yeterli; -md kullanmak
+                  // PDF'i gereksiz yere birkaç kat büyütüyor
                   <img
-                    src={`/${p.images[0].basePath}-md.webp`}
+                    src={`/${p.images[0].basePath}-sm.webp`}
                     alt={p.name}
-                    style={{ width: "42mm", height: "32mm", objectFit: "cover", borderRadius: "2mm", border: "0.5pt solid #D2D8DE" }}
+                    style={{
+                      width: "42mm",
+                      height: "32mm",
+                      objectFit: "contain",
+                      background: "#0C0C0B",
+                      borderRadius: "2mm",
+                    }}
                   />
                 ) : (
                   <div style={{ width: "42mm", height: "32mm", background: "#E8ECEF", borderRadius: "2mm" }} />
@@ -178,10 +201,11 @@ export default async function KatalogBaskiPage({
                 <h3 className="font-display" style={{ fontSize: "12pt", fontWeight: 600, lineHeight: 1.25 }}>
                   {p.name}
                 </h3>
-                <p style={{ fontSize: "9pt", color: "#6E7B88", marginTop: "1mm" }}>
-                  {p.brand?.name}
-                  {p.model ? ` · ${p.model}` : ""}
-                </p>
+                {[p.brand?.name, p.model].filter(Boolean).length > 0 && (
+                  <p style={{ fontSize: "9pt", color: "#6E7B88", marginTop: "1mm" }}>
+                    {[p.brand?.name, p.model].filter(Boolean).join(" · ")}
+                  </p>
+                )}
                 {p.shortDesc && (
                   <p style={{ fontSize: "9pt", color: "#4A5561", marginTop: "2mm", lineHeight: 1.4 }}>
                     {p.shortDesc}

@@ -31,7 +31,7 @@ export function ImageGallery({ images }: { images: GalleryImage[] }) {
 
   if (images.length === 0) {
     return (
-      <div className="flex aspect-[4/3] items-center justify-center rounded-lg bg-steel-100 text-sm text-steel-400">
+      <div className="flex aspect-[4/3] items-center justify-center rounded-lg bg-steel-900 text-sm text-steel-500">
         Görsel hazırlanıyor
       </div>
     );
@@ -47,7 +47,7 @@ export function ImageGallery({ images }: { images: GalleryImage[] }) {
           setLightbox(true);
           setZoomed(false);
         }}
-        className="group relative block w-full cursor-zoom-in overflow-hidden rounded-lg border border-steel-200 bg-white"
+        className="group relative block w-full cursor-zoom-in overflow-hidden rounded-lg border border-steel-800 bg-photo"
         aria-label="Görseli büyüt"
       >
         <ProductImage
@@ -55,7 +55,7 @@ export function ImageGallery({ images }: { images: GalleryImage[] }) {
           alt={current.alt}
           sizes="(max-width: 768px) 100vw, 50vw"
           priority
-          className="aspect-[4/3] w-full object-cover"
+          className="aspect-square w-full object-contain"
         />
         <span className="absolute right-3 bottom-3 flex size-10 items-center justify-center rounded-full bg-steel-950/70 text-steel-50 opacity-0 backdrop-blur transition-opacity group-hover:opacity-100">
           <ZoomIn className="size-5" />
@@ -70,7 +70,7 @@ export function ImageGallery({ images }: { images: GalleryImage[] }) {
               type="button"
               onClick={() => setSelected(i)}
               className={cn(
-                "w-20 shrink-0 overflow-hidden rounded-md border-2",
+                "w-20 shrink-0 overflow-hidden rounded-md border-2 bg-photo",
                 i === selected ? "border-steel-950" : "border-transparent opacity-70",
               )}
               aria-label={`Görsel ${i + 1}`}
@@ -79,7 +79,7 @@ export function ImageGallery({ images }: { images: GalleryImage[] }) {
                 basePath={img.basePath}
                 alt=""
                 sizes="80px"
-                className="aspect-[4/3] w-full object-cover"
+                className="aspect-[4/3] w-full object-contain"
               />
             </button>
           ))}

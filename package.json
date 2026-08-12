@@ -11,7 +11,9 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
-    "import": "tsx scripts/import-excel.ts",
+    "import:urunler": "tsx scripts/import-urunler.ts",
+    "temizle": "tsx scripts/temizle.ts",
+    "import:excel": "tsx scripts/import-excel.ts",
     "import:sample": "tsx scripts/make-sample-import.ts"
   },
   "prisma": {

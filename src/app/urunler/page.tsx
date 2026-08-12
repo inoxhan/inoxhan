@@ -8,7 +8,7 @@ import { getBrands, getCategories, getProducts } from "@/server/catalog";
 export const metadata: Metadata = {
   title: "Ürün Kütüphanesi",
   description:
-    "Hırdavat ve bağlantı elemanlarında yüzlerce ürün. Aradığınızı bulun, tek tıkla teklif isteyin.",
+    "DIN ve ISO normlarında paslanmaz çelik bağlantı elemanları. Aradığınızı bulun, tek tıkla teklif isteyin.",
   alternates: { canonical: "/urunler" },
 };
 
@@ -46,7 +46,7 @@ export default async function UrunlerPage({
           Ürün Kütüphanesi
         </h1>
         <p className="mt-3 text-lg text-steel-500">
-          {result.total} ürün · Fiyat sormak için tek tık yeter
+          {result.total} ürün · DIN / ISO normlarında · A2 ve A4 kalite
         </p>
       </header>
 

@@ -108,9 +108,16 @@ export default async function TeklifDetayPage({
                   <p className="font-mono text-xs text-steel-400">{item.product.sku}</p>
                 )}
               </div>
-              <p className="shrink-0 text-sm font-medium text-steel-700">
-                {item.quantity} {item.unit}
-              </p>
+              <div className="shrink-0 text-right">
+                <p className="text-sm font-medium text-steel-700">
+                  {item.quantity} {item.unit}
+                </p>
+                {item.quality && (
+                  <p className="mt-0.5 text-xs font-medium text-steel-900">
+                    Kalite: {item.quality}
+                  </p>
+                )}
+              </div>
             </li>
           ))}
         </ul>

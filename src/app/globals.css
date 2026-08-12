@@ -20,6 +20,10 @@
 
   --color-signal: #e8b54a;
 
+  /* Ürün fotoğraflarının stüdyo zemini (ölçüldü: ~rgb(12,12,11)).
+     Görsel kutusu bu renk olunca fotoğrafın kenarı ile kutu arasında sınır görünmez. */
+  --color-photo: #0c0c0b;
+
   /* Panel durum renkleri (kısık) */
   --color-status-new: #3b82f6;
   --color-status-pending: #d97706;

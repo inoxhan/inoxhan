@@ -33,7 +33,7 @@ export interface QuoteNotification {
   company: string | null;
   phone: string;
   email: string | null;
-  items: { label: string; quantity: number; unit: string }[];
+  items: { label: string; quantity: number; unit: string; quality?: string | null }[];
   note: string | null;
   hasAttachment: boolean;
   source: string;
@@ -45,7 +45,10 @@ export async function sendQuoteNotification(q: QuoteNotification): Promise<void>
   if (!to && !isDev) return;
 
   const itemLines = q.items
-    .map((i) => `• ${i.label} — ${i.quantity} ${i.unit}`)
+    .map(
+      (i) =>
+        `• ${i.label} — ${i.quantity} ${i.unit}${i.quality ? ` — Kalite: ${i.quality}` : ""}`,
+    )
     .join("\n");
 
   const text = [

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { normalizePhoneTr } from "@/lib/phone";
-import { QUOTE_UNITS } from "@/lib/constants";
+import { QUALITY_OPTIONS, QUOTE_UNITS } from "@/lib/constants";
 
 /**
  * Teklif formu doğrulama şeması — istemcide (RHF) ve sunucuda (server action)
@@ -25,6 +25,8 @@ export const quoteSchema = z.object({
   productText: z.string().trim().max(300, "Ürün açıklaması çok uzun").optional().or(z.literal("")),
   quantity: z.coerce.number().int("Adet tam sayı olmalı").min(1, "Adet en az 1 olmalı").max(1_000_000),
   unit: z.enum(QUOTE_UNITS),
+  // Paslanmaz kalite sınıfı; katalog ürününde zorunlu, serbest talepte opsiyonel
+  quality: z.enum(QUALITY_OPTIONS).optional().or(z.literal("")),
   note: z.string().trim().max(2000, "Not çok uzun").optional().or(z.literal("")),
   kvkk: z.boolean().refine((v) => v === true, {
     message: "Devam etmek için KVKK metnini onaylamanız gerekir",

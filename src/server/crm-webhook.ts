@@ -10,7 +10,13 @@ export interface CrmQuotePayload {
   quoteId: string;
   createdAt: string;
   customer: { name: string; company: string | null; phone: string; email: string | null };
-  items: { sku: string | null; label: string; quantity: number; unit: string }[];
+  items: {
+    sku: string | null;
+    label: string;
+    quantity: number;
+    unit: string;
+    quality: string | null;
+  }[];
   note: string | null;
   source: string;
 }

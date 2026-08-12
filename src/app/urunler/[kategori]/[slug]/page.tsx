@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { Clock, FileText, MessageCircle, Zap } from "lucide-react";
+import { Clock, FileText, MessageCircle } from "lucide-react";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { ImageGallery } from "@/components/catalog/ImageGallery";
+import { QualityPicker } from "@/components/catalog/QualityPicker";
 import { SpecTable } from "@/components/catalog/SpecTable";
-import { buttonStyles } from "@/components/ui/Button";
 import { SITE } from "@/lib/constants";
 import { getProductBySlug } from "@/server/catalog";
 import { getSetting } from "@/server/settings";
@@ -51,7 +51,8 @@ export default async function UrunDetayPage({ params }: { params: Promise<Params
     redirect(`/urunler/${product.category.slug}/${product.slug}`);
   }
 
-  const quoteHref = `/teklif?urun=${encodeURIComponent(product.sku)}&kaynak=product`;
+  // Marka yoksa " · " ayracı başıboş kalmasın diye dolu parçalar birleştirilir
+  const subtitle = [product.brand?.name, product.model].filter(Boolean).join(" · ");
   const useAreas =
     product.useAreas?.split(",").map((s) => s.trim()).filter(Boolean) ?? [];
 
@@ -121,25 +122,14 @@ export default async function UrunDetayPage({ params }: { params: Promise<Params
           <h1 className="font-display mt-2 text-3xl leading-tight font-bold tracking-tight text-steel-900 md:text-4xl">
             {product.name}
           </h1>
-          <p className="mt-2 text-steel-500">
-            {product.brand?.name}
-            {product.model ? ` · ${product.model}` : ""}
-          </p>
+          {subtitle && <p className="mt-2 text-steel-500">{subtitle}</p>}
 
           {product.shortDesc && (
             <p className="mt-5 leading-relaxed text-steel-600">{product.shortDesc}</p>
           )}
 
           <div className="mt-8 rounded-lg border border-steel-200 bg-white p-5 shadow-card">
-            <Link
-              href={quoteHref}
-              data-track="quote_button_click"
-              data-track-payload={JSON.stringify({ where: "detail", sku: product.sku })}
-              className={buttonStyles({ variant: "metallic", size: "lg", className: "w-full" })}
-            >
-              <Zap className="size-5" aria-hidden />
-              Bu Ürün İçin Teklif Al
-            </Link>
+            <QualityPicker sku={product.sku} />
             {waHref && (
               <a
                 href={waHref}

@@ -83,10 +83,40 @@ async function main() {
     const count = Number(resultText?.match(/(\d+)/)?.[1] ?? 0);
     check('arama: yazım hatalı "cıvta" sonuç buldu', count > 0, `${count} sonuç`);
     await page.screenshot({ path: path.join(SHOT_DIR, "search-civta.png") });
+
+    // Norm kodu araması — müşterinin en sık kullanacağı yol
+    await page.fill('input[type="search"]', "DIN 933");
+    await page.waitForTimeout(1200);
+    const normText = await page.locator("text=sonuç bulundu").textContent();
+    const normCount = Number(normText?.match(/(\d+)/)?.[1] ?? 0);
+    check('arama: "DIN 933" norm kodu bulundu', normCount > 0, `${normCount} sonuç`);
     await ctx.close();
   }
 
-  // ── 4. Panel giriş + SLA ──
+  // ── 4. Teklif formu gönderimi (panel kontrolü buna dayanır) ──
+  {
+    const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+    const page = await ctx.newPage();
+    await page.goto(`${BASE}/teklif?urun=DIN+934&kalite=A4&kaynak=product`, {
+      waitUntil: "networkidle",
+    });
+    const chip = await page.locator("text=DIN 934").count();
+    check("form: ürün ön-seçimi geldi", chip > 0);
+    const a4Checked = await page.locator('input[name="quality"][value="A4"]').isChecked();
+    check("form: URL'den gelen A4 kalitesi seçili", a4Checked);
+    await page.fill('input[name="name"]', "E2E Test Kullanıcı");
+    await page.fill('input[name="phone"]', "0533 111 22 33");
+    await page.fill('input[name="email"]', "e2e@example.com");
+    await page.fill('input[name="quantity"]', "100");
+    await page.check('input[name="kvkk"]');
+    await page.click('button[type="submit"]');
+    await page.waitForSelector("text=Talebin Alındı", { timeout: 15000 });
+    check("form: gönderim başarılı — 'Talebin Alındı!'", true);
+    await page.screenshot({ path: path.join(SHOT_DIR, "quote-success.png") });
+    await ctx.close();
+  }
+
+  // ── 5. Panel: giriş + az önce gönderilen talebin düşmesi ──
   {
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     const page = await ctx.newPage();
@@ -106,32 +136,13 @@ async function main() {
     check("panel: doğru şifre ile giriş", page.url().endsWith("/panel"));
 
     await page.goto(`${BASE}/panel/teklifler`, { waitUntil: "networkidle" });
+    const row = await page.locator("text=E2E Test Kullanıcı").count();
+    check("panel: yeni gönderilen talep listede", row > 0);
     const timer = await page.locator("text=Geçen süre").count();
     check("panel: canlı SLA sayacı görünür", timer > 0, `${timer} satır`);
-    const overdue = await page.locator(".text-status-overdue").count();
-    check("panel: 60+ dk geciken kırmızı vurgulu", overdue > 0);
+    const quality = await page.locator("text=A4").count();
+    check("panel: talebin kalite bilgisi görünür", quality > 0);
     await page.screenshot({ path: path.join(SHOT_DIR, "panel-teklifler.png") });
-    await ctx.close();
-  }
-
-  // ── 5. Teklif formu gönderimi ──
-  {
-    const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-    const page = await ctx.newPage();
-    await page.goto(`${BASE}/teklif?urun=INX-SM-0001&kaynak=product`, {
-      waitUntil: "networkidle",
-    });
-    const chip = await page.locator("text=INX-SM-0001").count();
-    check("form: ürün ön-seçimi geldi", chip > 0);
-    await page.fill('input[name="name"]', "E2E Test Kullanıcı");
-    await page.fill('input[name="phone"]', "0533 111 22 33");
-    await page.fill('input[name="email"]', "e2e@example.com");
-    await page.fill('input[name="quantity"]', "100");
-    await page.check('input[name="kvkk"]');
-    await page.click('button[type="submit"]');
-    await page.waitForSelector("text=Talebin Alındı", { timeout: 15000 });
-    check("form: gönderim başarılı — 'Talebin Alındı!'", true);
-    await page.screenshot({ path: path.join(SHOT_DIR, "quote-success.png") });
     await ctx.close();
   }
 

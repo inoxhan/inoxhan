@@ -119,6 +119,7 @@ model QuoteItem {
   freeText       String? // "8'lik dübel, siyah"
   quantity       Int          @default(1)
   unit           String       @default("adet") // adet | kutu | paket
+  quality        String? // A2 (AISI 304) | A4 (AISI 316) — zod korumalı
   quoteRequest   QuoteRequest @relation(fields: [quoteRequestId], references: [id], onDelete: Cascade)
   product        Product?     @relation(fields: [productId], references: [id])
 }

@@ -88,6 +88,7 @@ export default async function TekliflerPage({
                     </p>
                     <p className="text-xs text-steel-400">
                       {item ? `${item.quantity} ${item.unit}` : ""}
+                      {item?.quality ? ` · ${item.quality}` : ""}
                       {q.items.length > 1 ? ` +${q.items.length - 1} kalem` : ""}
                     </p>
                   </div>

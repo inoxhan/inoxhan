@@ -175,7 +175,7 @@ export function ProductForm({ categories, initial }: ProductFormProps) {
                 key={bp}
                 src={`/${bp}-sm.webp`}
                 alt=""
-                className="size-16 rounded-md border border-steel-200 object-cover"
+                className="size-16 rounded-md border border-steel-800 bg-photo object-contain"
               />
             ))}
           </div>

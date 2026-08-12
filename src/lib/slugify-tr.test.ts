@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeTr, slugifyTr } from "./slugify-tr";
+import { lowerCaseTr, normalizeTr, slugifyTr, titleCaseTr } from "./slugify-tr";
 
 describe("slugifyTr", () => {
   it("Türkçe karakterleri dönüştürür", () => {
@@ -34,5 +34,44 @@ describe("normalizeTr", () => {
   it("boşlukları korur, harfleri sadeleştirir", () => {
     expect(normalizeTr("Cıvata M8")).toBe("civata m8");
     expect(normalizeTr("ŞIK ÜRÜN")).toBe("sik urun");
+  });
+});
+
+describe("titleCaseTr", () => {
+  it("Türkçe I/İ kurallarına uyar", () => {
+    // toLowerCase() olsaydı "Tirtikli Rondela Dis" çıkardı
+    expect(titleCaseTr("INOX TIRTIKLI RONDELA DIŞ")).toBe("INOX Tırtıklı Rondela Dış");
+    expect(titleCaseTr("INOX TIRTIKLI RONDELA İÇ")).toBe("INOX Tırtıklı Rondela İç");
+    expect(titleCaseTr("INOX YILDIZ HAVŞA BAŞLI SAÇ VİDASI")).toBe(
+      "INOX Yıldız Havşa Başlı Saç Vidası",
+    );
+  });
+
+  it("kısaltmaları ve tip eklerini büyük bırakır", () => {
+    expect(titleCaseTr("INOX MİL EMNİYET SEGMANI TİP A")).toBe(
+      "INOX Mil Emniyet Segmanı Tip A",
+    );
+    expect(titleCaseTr("INOX GUPİLYA")).toBe("INOX Gupilya");
+  });
+
+  it("norm numaralarını ve ölçüleri bozmaz", () => {
+    expect(titleCaseTr("DIN 933 M8x40")).toBe("DIN 933 M8x40");
+    expect(titleCaseTr("INOX DÜZ KAMA DIN 6885 A")).toBe("INOX Düz Kama DIN 6885 A");
+  });
+
+  it("İngilizce global adları düzgün yazar", () => {
+    expect(titleCaseTr("DROP IN ANCHOR")).toBe("Drop In Anchor");
+    expect(titleCaseTr("INOX DOG POINT SETSKUR")).toBe("INOX Dog Point Setskur");
+  });
+});
+
+describe("lowerCaseTr", () => {
+  it("cümle içi kullanım için küçültür, kısaltmaları korur", () => {
+    expect(lowerCaseTr("Altıköşe Başlı Metrik Diş Tam Paso Cıvata")).toBe(
+      "altıköşe başlı metrik diş tam paso cıvata",
+    );
+    expect(lowerCaseTr("Mil Emniyet Segmanı Tip A")).toBe("mil emniyet segmanı tip A");
+    expect(lowerCaseTr("Dog Point Setskur")).toBe("dog point setskur");
+    expect(lowerCaseTr("Tırtıklı Rondela Dış")).toBe("tırtıklı rondela dış");
   });
 });

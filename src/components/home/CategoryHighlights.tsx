@@ -38,15 +38,16 @@ export function CategoryHighlights({ categories }: { categories: CategoryCard[] 
           <Reveal key={c.slug} delay={Math.min(i * 0.07, 0.3)}>
             <Link
               href={`/urunler/${c.slug}`}
-              className="group relative block overflow-hidden rounded-lg border border-steel-200 bg-steel-900 shadow-card"
+              className="group relative block overflow-hidden rounded-lg border border-steel-800 bg-photo shadow-card"
             >
               <ProductImage
                 basePath={c.imagePath}
                 alt={c.name}
                 sizes="(max-width: 768px) 50vw, 33vw"
-                className="aspect-[4/3] w-full object-cover opacity-80 transition-all duration-500 group-hover:scale-[1.05] group-hover:opacity-100"
+                className="aspect-[4/3] w-full object-contain transition-transform duration-500 group-hover:scale-[1.06]"
               />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-steel-950/90 to-transparent p-4 md:p-5">
+              {/* Fotoğrafın parlak metal detayları metni yutmasın diye güçlü alt gradyan */}
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/85 to-transparent p-4 pt-14 md:p-5 md:pt-16">
                 <p className="font-display text-lg font-semibold text-steel-50 md:text-xl">
                   {c.name}
                 </p>

@@ -53,23 +53,29 @@ export function FilterPanel({
         ))}
       </div>
 
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 md:flex-wrap" aria-label="Markalar">
-        <span className="shrink-0 text-xs tracking-wide text-steel-400 uppercase">Marka:</span>
-        <Link href={basePath} className={chipClass(!activeBrandSlug)}>
-          Tümü
-        </Link>
-        {brands
-          .filter((b) => b.count > 0)
-          .map((b) => (
-            <Link
-              key={b.slug}
-              href={`${basePath}?marka=${b.slug}`}
-              className={chipClass(activeBrandSlug === b.slug)}
-            >
-              {b.name}
-            </Link>
-          ))}
-      </div>
+      {/* Ürünlerde marka bilgisi yoksa filtre satırı hiç gösterilmez */}
+      {brands.some((b) => b.count > 0) && (
+        <div
+          className="flex items-center gap-2 overflow-x-auto pb-1 md:flex-wrap"
+          aria-label="Markalar"
+        >
+          <span className="shrink-0 text-xs tracking-wide text-steel-400 uppercase">Marka:</span>
+          <Link href={basePath} className={chipClass(!activeBrandSlug)}>
+            Tümü
+          </Link>
+          {brands
+            .filter((b) => b.count > 0)
+            .map((b) => (
+              <Link
+                key={b.slug}
+                href={`${basePath}?marka=${b.slug}`}
+                className={chipClass(activeBrandSlug === b.slug)}
+              >
+                {b.name}
+              </Link>
+            ))}
+        </div>
+      )}
     </div>
   );
 }

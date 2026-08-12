@@ -29,7 +29,7 @@ export function ProductImage({
   if (!basePath) {
     return (
       <div
-        className={`flex items-center justify-center bg-steel-100 text-xs text-steel-400 ${className ?? ""}`}
+        className={`flex items-center justify-center bg-steel-900 text-xs text-steel-500 ${className ?? ""}`}
       >
         Görsel hazırlanıyor
       </div>
@@ -37,16 +37,18 @@ export function ProductImage({
   }
 
   return (
-    <picture>
+    // display:contents — <picture> inline bir kutu oluşturmasın; aksi halde
+    // img'in h-full değeri boyutsuz bir ebeveyne göre çözümlenip 0'a düşer.
+    <picture className="contents">
       <source type="image/avif" srcSet={srcset(basePath, "avif")} sizes={sizes} />
       <source type="image/webp" srcSet={srcset(basePath, "webp")} sizes={sizes} />
+      {/* Oranlar üründen ürüne değişiyor (kare, yatay, dikey) — kutuyu saran
+          kapsayıcı oranı belirler, görsel object-contain ile içine yerleşir. */}
       <img
         src={`/${basePath}-md.webp`}
         alt={alt}
         loading={priority ? "eager" : "lazy"}
         decoding="async"
-        width={960}
-        height={720}
         className={className}
       />
     </picture>

@@ -38,9 +38,17 @@ export function buildSearchIndex(items: SearchIndexItem[]) {
   return mini;
 }
 
+/**
+ * Önce tüm kelimelerin eşleştiği (AND) sonuçlar denenir: ürün kodlarının hepsi
+ * "DIN" ile başladığı için OR araması "DIN 933"e neredeyse tüm katalogu döndürür.
+ * AND hiç sonuç vermezse (örn. katalogda olmayan bir ölçü yazılmışsa) daha
+ * toleranslı OR aramasına düşülür — kullanıcı boş ekranla karşılaşmaz.
+ */
 export function searchProducts(
   mini: MiniSearch<SearchIndexItem>,
   query: string,
 ): SearchIndexItem[] {
-  return mini.search(query) as unknown as SearchIndexItem[];
+  const strict = mini.search(query, { combineWith: "AND" });
+  const results = strict.length > 0 ? strict : mini.search(query);
+  return results as unknown as SearchIndexItem[];
 }

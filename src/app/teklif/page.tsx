@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 interface SearchParams {
   urun?: string;
   kaynak?: string;
+  kalite?: string;
 }
 
 export default async function TeklifPage({
@@ -101,6 +102,7 @@ export default async function TeklifPage({
         <div className="rounded-lg border border-steel-200 bg-white p-6 shadow-card md:p-8">
           <QuoteForm
             preselected={product}
+            preselectedQuality={sp.kalite}
             source={sp.kaynak === "product" ? "product" : (sp.kaynak ?? "form")}
           />
         </div>

@@ -7,7 +7,7 @@ import { getLatestCatalogFile } from "@/server/catalog-pdf";
 export const metadata: Metadata = {
   title: "Ürün Kataloğu",
   description:
-    "İnoxhan ürün kataloğu — tüm ürünler, teknik özellikler ve QR kodlarla PDF olarak.",
+    "İnoxhan ürün kataloğu — paslanmaz çelik bağlantı elemanları, DIN/ISO normları ve QR kodlarla PDF olarak.",
 };
 
 // Son üretilen kataloğu her istekte diskten kontrol eder

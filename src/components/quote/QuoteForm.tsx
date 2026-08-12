@@ -8,7 +8,12 @@ import { useForm } from "react-hook-form";
 import { QuoteSuccess } from "@/components/quote/QuoteSuccess";
 import { Button } from "@/components/ui/Button";
 import { track } from "@/lib/analytics-client";
-import { QUOTE_UNITS } from "@/lib/constants";
+import {
+  QUALITY_HINTS,
+  QUALITY_LABELS,
+  QUALITY_OPTIONS,
+  QUOTE_UNITS,
+} from "@/lib/constants";
 import type { z } from "zod";
 import {
   ATTACHMENT_MAX_BYTES,
@@ -30,6 +35,8 @@ export interface PreselectedProduct {
 interface QuoteFormProps {
   preselected?: PreselectedProduct | null;
   source?: string;
+  /** Ürün detayından seçilerek gelinen paslanmaz kalite sınıfı */
+  preselectedQuality?: string;
 }
 
 const inputClass =
@@ -58,7 +65,11 @@ function Field({
   );
 }
 
-export function QuoteForm({ preselected, source = "form" }: QuoteFormProps) {
+export function QuoteForm({
+  preselected,
+  source = "form",
+  preselectedQuality,
+}: QuoteFormProps) {
   const [done, setDone] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
@@ -89,6 +100,9 @@ export function QuoteForm({ preselected, source = "form" }: QuoteFormProps) {
       productText: "",
       quantity: 1,
       unit: "adet",
+      quality: (QUALITY_OPTIONS as readonly string[]).includes(preselectedQuality ?? "")
+        ? (preselectedQuality as (typeof QUALITY_OPTIONS)[number])
+        : "A2",
       kvkk: false,
       source,
     },
@@ -127,6 +141,7 @@ export function QuoteForm({ preselected, source = "form" }: QuoteFormProps) {
     fd.set("productText", values.productText ?? "");
     fd.set("quantity", String(values.quantity));
     fd.set("unit", values.unit);
+    fd.set("quality", values.quality ?? "");
     fd.set("note", values.note ?? "");
     fd.set("kvkk", String(values.kvkk));
     fd.set("source", values.source ?? source);
@@ -180,6 +195,37 @@ export function QuoteForm({ preselected, source = "form" }: QuoteFormProps) {
           />
         </Field>
       )}
+
+      {/* Paslanmaz kalite sınıfı — fiyat farkı yarattığı için baştan sorulur */}
+      <fieldset>
+        <legend className="mb-1.5 block text-sm font-medium text-steel-700">
+          Kalite <span className="text-status-overdue">*</span>
+        </legend>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {QUALITY_OPTIONS.map((q) => (
+            <label
+              key={q}
+              className="flex cursor-pointer items-start gap-3 rounded-md border border-steel-200 bg-white px-4 py-3 transition-colors has-checked:border-steel-950 has-checked:bg-steel-50"
+            >
+              <input
+                type="radio"
+                value={q}
+                className="mt-0.5 size-4 shrink-0 accent-steel-950"
+                {...register("quality")}
+              />
+              <span className="min-w-0">
+                <span className="block text-sm font-medium text-steel-900">
+                  {QUALITY_LABELS[q]}
+                </span>
+                <span className="block text-xs text-steel-500">{QUALITY_HINTS[q]}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+        <p className="mt-1.5 text-xs text-steel-400">
+          Emin değilseniz A2 seçin, ekibimiz kullanım yerinize göre yönlendirsin.
+        </p>
+      </fieldset>
 
       <div className="grid gap-5 sm:grid-cols-2">
         <Field label="Ad Soyad" required error={errors.name?.message}>

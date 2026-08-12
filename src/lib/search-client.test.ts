@@ -58,4 +58,18 @@ describe("arama (MiniSearch + normalizeTr)", () => {
   it("alakasız sorguda boş döner", () => {
     expect(searchProducts(mini, "xqzw")).toHaveLength(0);
   });
+
+  it("çok kelimeli sorguda AND ile daraltır", () => {
+    // "DIN 933" her iki ürünle de "DIN" üzerinden eşleşir; AND sonucu tek ürüne indirir
+    const r = searchProducts(mini, "DIN 933");
+    expect(r[0]?.sku).toBe("INX-CV-0001");
+    expect(r).toHaveLength(1);
+  });
+
+  it("AND sonuç vermezse OR'a düşer (boş ekran olmaz)", () => {
+    // "M12" katalogda yok; "somun" eşleşmesi yine de sonuç döndürmeli
+    const r = searchProducts(mini, "somun M12");
+    expect(r.length).toBeGreaterThan(0);
+    expect(r[0]?.sku).toBe("INX-SM-0002");
+  });
 });

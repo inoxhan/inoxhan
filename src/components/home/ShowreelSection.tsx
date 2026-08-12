@@ -58,19 +58,22 @@ export function ShowreelSection({ slides }: { slides: ShowreelSlide[] }) {
             loading="lazy"
             decoding="async"
             className={cn(
-              "absolute inset-0 size-full object-cover transition-opacity duration-1000",
-              i === index ? "opacity-40" : "opacity-0",
+              "absolute inset-0 size-full object-contain p-6 transition-opacity duration-1000 md:p-10",
+              i === index ? "opacity-100" : "opacity-0",
               i === index && !reduced && "animate-kenburns",
             )}
           />
         ))}
-        <div className="absolute inset-0 bg-gradient-to-t from-steel-950 via-steel-950/40 to-steel-950/70" />
+        {/* Fotoğraflar zaten siyah zeminli — overlay hafif tutulur, metnin
+            okunabilirliğini asıl sağlayan aşağıdaki gölge. */}
+        <div className="absolute inset-0 bg-gradient-to-t from-steel-950 via-steel-950/20 to-steel-950/45" />
 
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
           <p
             key={captionIndex}
             className={cn(
               "font-display max-w-3xl text-3xl font-bold tracking-tight text-steel-50 md:text-5xl",
+              "[text-shadow:0_2px_28px_rgba(0,0,0,0.95),0_1px_4px_rgba(0,0,0,0.9)]",
               !reduced && "animate-[fadeup_0.8s_ease-out]",
             )}
           >
