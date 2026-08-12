@@ -1,0 +1,306 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Paperclip, X, Zap } from "lucide-react";
+import Link from "next/link";
+import { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { QuoteSuccess } from "@/components/quote/QuoteSuccess";
+import { Button } from "@/components/ui/Button";
+import { QUOTE_UNITS } from "@/lib/constants";
+import type { z } from "zod";
+import {
+  ATTACHMENT_MAX_BYTES,
+  ATTACHMENT_TYPES,
+  quoteSchema,
+  type QuoteFormValues,
+} from "@/lib/quote-schema";
+
+/** RHF, zod coerce alanları için girdi/çıktı tiplerini ayrı ister. */
+type QuoteFormInput = z.input<typeof quoteSchema>;
+import { submitQuote } from "@/server/actions/quote";
+import { cn } from "@/lib/utils";
+
+export interface PreselectedProduct {
+  sku: string;
+  name: string;
+}
+
+interface QuoteFormProps {
+  preselected?: PreselectedProduct | null;
+  source?: string;
+}
+
+const inputClass =
+  "h-11 w-full rounded-md border border-steel-200 bg-white px-3.5 text-[15px] text-steel-900 placeholder:text-steel-400 focus:border-steel-500 focus:outline-none";
+
+function Field({
+  label,
+  required,
+  error,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  error?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-sm font-medium text-steel-700">
+        {label}
+        {required && <span className="text-status-overdue"> *</span>}
+      </span>
+      {children}
+      {error && <span className="mt-1 block text-sm text-status-overdue">{error}</span>}
+    </label>
+  );
+}
+
+export function QuoteForm({ preselected, source = "form" }: QuoteFormProps) {
+  const [done, setDone] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [productLocked, setProductLocked] = useState(Boolean(preselected));
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<QuoteFormInput, unknown, QuoteFormValues>({
+    resolver: zodResolver(quoteSchema),
+    defaultValues: {
+      productSku: preselected?.sku ?? "",
+      productText: "",
+      quantity: 1,
+      unit: "adet",
+      kvkk: false,
+      source,
+    },
+  });
+
+  function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setFileError(null);
+    const f = e.target.files?.[0];
+    if (!f) {
+      setFileName(null);
+      return;
+    }
+    if (f.size > ATTACHMENT_MAX_BYTES) {
+      setFileError("Dosya 10 MB'dan büyük olamaz");
+      e.target.value = "";
+      setFileName(null);
+      return;
+    }
+    if (!ATTACHMENT_TYPES.includes(f.type as (typeof ATTACHMENT_TYPES)[number])) {
+      setFileError("Yalnızca fotoğraf veya PDF yükleyebilirsiniz");
+      e.target.value = "";
+      setFileName(null);
+      return;
+    }
+    setFileName(f.name);
+  }
+
+  const onSubmit = handleSubmit(async (values) => {
+    setServerError(null);
+    const fd = new FormData();
+    fd.set("name", values.name);
+    fd.set("company", values.company ?? "");
+    fd.set("phone", values.phone);
+    fd.set("email", values.email);
+    fd.set("productSku", productLocked ? (values.productSku ?? "") : "");
+    fd.set("productText", values.productText ?? "");
+    fd.set("quantity", String(values.quantity));
+    fd.set("unit", values.unit);
+    fd.set("note", values.note ?? "");
+    fd.set("kvkk", String(values.kvkk));
+    fd.set("source", values.source ?? source);
+    const file = fileRef.current?.files?.[0];
+    if (file) fd.set("attachment", file);
+
+    const res = await submitQuote(fd);
+    if (res.ok) {
+      setDone(res.quoteId);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      setServerError(res.message);
+    }
+  });
+
+  if (done) return <QuoteSuccess />;
+
+  return (
+    <form onSubmit={onSubmit} noValidate className="space-y-5">
+      <input type="hidden" {...register("source")} />
+      <input type="hidden" {...register("productSku")} />
+
+      {/* Ürün */}
+      {productLocked && preselected ? (
+        <div className="flex items-center justify-between gap-3 rounded-md border border-steel-200 bg-steel-100 px-4 py-3">
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-steel-900">{preselected.name}</p>
+            <p className="font-mono text-xs text-steel-500">{preselected.sku}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setProductLocked(false)}
+            className="shrink-0 text-sm text-steel-500 underline-offset-4 hover:underline"
+          >
+            Değiştir
+          </button>
+        </div>
+      ) : (
+        <Field
+          label="Ürün / İhtiyacınız"
+          required
+          error={errors.productText?.message}
+        >
+          <input
+            type="text"
+            placeholder="Ürün adı, kodu veya kısaca ihtiyacınız (örn. 8'lik dübel, 1000 adet)"
+            className={inputClass}
+            {...register("productText")}
+          />
+        </Field>
+      )}
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        <Field label="Ad Soyad" required error={errors.name?.message}>
+          <input type="text" autoComplete="name" className={inputClass} {...register("name")} />
+        </Field>
+        <Field label="Firma" error={errors.company?.message}>
+          <input
+            type="text"
+            autoComplete="organization"
+            placeholder="Opsiyonel"
+            className={inputClass}
+            {...register("company")}
+          />
+        </Field>
+        <Field label="Telefon" required error={errors.phone?.message}>
+          <input
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder="0 (5xx) xxx xx xx"
+            className={inputClass}
+            {...register("phone")}
+          />
+        </Field>
+        <Field label="E-posta" required error={errors.email?.message}>
+          <input
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            className={inputClass}
+            {...register("email")}
+          />
+        </Field>
+        <Field label="Adet" required error={errors.quantity?.message}>
+          <input type="number" min={1} className={inputClass} {...register("quantity")} />
+        </Field>
+        <Field label="Birim" error={errors.unit?.message}>
+          <select className={inputClass} {...register("unit")}>
+            {QUOTE_UNITS.map((u) => (
+              <option key={u} value={u}>
+                {u}
+              </option>
+            ))}
+          </select>
+        </Field>
+      </div>
+
+      <Field label="Not" error={errors.note?.message}>
+        <textarea
+          rows={3}
+          placeholder="Teslimat, ölçü, kaplama gibi detaylar… (opsiyonel)"
+          className={cn(inputClass, "h-auto py-2.5")}
+          {...register("note")}
+        />
+      </Field>
+
+      {/* Dosya — "Bana bu ürün lazım" */}
+      <div>
+        <span className="mb-1.5 block text-sm font-medium text-steel-700">
+          Fotoğraf / Dosya <span className="font-normal text-steel-400">(opsiyonel)</span>
+        </span>
+        <label
+          className={cn(
+            "flex cursor-pointer items-center gap-3 rounded-md border border-dashed border-steel-300 bg-steel-50 px-4 py-3.5 text-sm text-steel-500 transition-colors hover:border-steel-500",
+            fileName && "border-solid border-steel-400 text-steel-800",
+          )}
+        >
+          <Paperclip className="size-4 shrink-0" aria-hidden />
+          <span className="min-w-0 flex-1 truncate">
+            {fileName ?? "Ürünün adını bilmiyorsanız fotoğrafını yükleyin — “Bana bu ürün lazım” deyin."}
+          </span>
+          {fileName && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                if (fileRef.current) fileRef.current.value = "";
+                setFileName(null);
+              }}
+              className="shrink-0 text-steel-400 hover:text-steel-700"
+              aria-label="Dosyayı kaldır"
+            >
+              <X className="size-4" />
+            </button>
+          )}
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*,application/pdf"
+            className="sr-only"
+            onChange={onFileChange}
+          />
+        </label>
+        {fileError && <p className="mt-1 text-sm text-status-overdue">{fileError}</p>}
+      </div>
+
+      {/* KVKK */}
+      <label className="flex items-start gap-3 text-sm text-steel-600">
+        <input
+          type="checkbox"
+          className="mt-0.5 size-4 shrink-0 accent-steel-950"
+          {...register("kvkk")}
+        />
+        <span>
+          <Link href="/kvkk" target="_blank" className="underline underline-offset-4">
+            KVKK Aydınlatma Metni
+          </Link>
+          &apos;ni okudum; iletişim bilgilerimin teklif süreci için işlenmesini
+          onaylıyorum.
+        </span>
+      </label>
+      {errors.kvkk && <p className="text-sm text-status-overdue">{errors.kvkk.message}</p>}
+
+      {serverError && (
+        <p className="rounded-md border border-status-overdue/30 bg-status-overdue/5 px-4 py-3 text-sm text-status-overdue">
+          {serverError}
+        </p>
+      )}
+
+      <Button
+        type="submit"
+        variant="metallic"
+        size="lg"
+        className="w-full"
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? (
+          <Loader2 className="size-5 animate-spin" aria-hidden />
+        ) : (
+          <Zap className="size-5" aria-hidden />
+        )}
+        {isSubmitting ? "Gönderiliyor…" : "Teklif Talebini Gönder"}
+      </Button>
+      <p className="text-center text-sm text-steel-500">
+        Ortalama tamamlama süresi 45 saniye · En geç 1 saat içinde dönüş
+      </p>
+    </form>
+  );
+}

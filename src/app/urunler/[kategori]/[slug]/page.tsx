@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { Clock, FileText, Zap } from "lucide-react";
+import { Clock, FileText, MessageCircle, Zap } from "lucide-react";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { ImageGallery } from "@/components/catalog/ImageGallery";
 import { SpecTable } from "@/components/catalog/SpecTable";
 import { buttonStyles } from "@/components/ui/Button";
 import { getProductBySlug } from "@/server/catalog";
+import { getSetting } from "@/server/settings";
 
 interface Params {
   kategori: string;
@@ -42,6 +43,13 @@ export default async function UrunDetayPage({ params }: { params: Promise<Params
   const quoteHref = `/teklif?urun=${encodeURIComponent(product.sku)}&kaynak=product`;
   const useAreas =
     product.useAreas?.split(",").map((s) => s.trim()).filter(Boolean) ?? [];
+
+  const whatsappNumber = await getSetting("whatsapp_number", process.env.WHATSAPP_NUMBER);
+  const waHref = whatsappNumber
+    ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+        `Merhaba, ${product.name} (SKU: ${product.sku}) için teklif almak istiyorum.`,
+      )}`
+    : null;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 md:py-16">
@@ -80,6 +88,17 @@ export default async function UrunDetayPage({ params }: { params: Promise<Params
               <Zap className="size-5" aria-hidden />
               Bu Ürün İçin Teklif Al
             </Link>
+            {waHref && (
+              <a
+                href={waHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-md border border-[#25D366]/40 bg-[#25D366]/10 font-medium text-[#128C4A] transition-colors hover:bg-[#25D366]/20"
+              >
+                <MessageCircle className="size-5" aria-hidden />
+                WhatsApp&apos;tan Teklif Al
+              </a>
+            )}
             <p className="mt-3 flex items-center justify-center gap-1.5 text-sm text-steel-500">
               <Clock className="size-4 text-signal" aria-hidden />
               En geç 1 saat içinde size dönüş yapıyoruz

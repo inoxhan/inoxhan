@@ -82,19 +82,22 @@ export async function getSearchIndexData() {
     orderBy: { name: "asc" },
   });
 
-  return products.map((p) => ({
-    id: p.id,
-    sku: p.sku,
-    name: p.name,
-    slug: p.slug,
-    model: p.model ?? "",
-    brand: p.brand?.name ?? "",
-    category: p.category.name,
-    categorySlug: p.category.slug,
-    image: p.images[0]?.basePath ?? null,
-    specText: p.specs.map((s) => `${s.key} ${s.value}`).join(" "),
-    specs: p.specs.map((s) => ({ key: s.key, value: s.value })),
-  }));
+  return products.map((p) => {
+    const image: string | null = p.images.length > 0 ? p.images[0].basePath : null;
+    return {
+      id: p.id,
+      sku: p.sku,
+      name: p.name,
+      slug: p.slug,
+      model: p.model ?? "",
+      brand: p.brand?.name ?? "",
+      category: p.category.name,
+      categorySlug: p.category.slug,
+      image,
+      specText: p.specs.map((s) => `${s.key} ${s.value}`).join(" "),
+      specs: p.specs.map((s) => ({ key: s.key, value: s.value })),
+    };
+  });
 }
 
 export type SearchIndexItem = Awaited<ReturnType<typeof getSearchIndexData>>[number];
