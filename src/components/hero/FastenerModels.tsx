@@ -8,8 +8,18 @@ import { ExtrudeGeometry, Path, Shape } from "three";
  * Fırçalanmış inox hissi: yüksek metalness + Lightformer yansımaları.
  */
 
-const STEEL = { color: "#C9D0D7", metalness: 0.95, roughness: 0.32 };
-const STEEL_DARK = { color: "#9AA2AC", metalness: 0.92, roughness: 0.42 };
+const STEEL = {
+  color: "#E2E7EC",
+  metalness: 0.88,
+  roughness: 0.22,
+  envMapIntensity: 1.6,
+};
+const STEEL_DARK = {
+  color: "#B9C2CA",
+  metalness: 0.85,
+  roughness: 0.34,
+  envMapIntensity: 1.3,
+};
 
 function hexShape(radius: number, holeRadius?: number): Shape {
   const shape = new Shape();

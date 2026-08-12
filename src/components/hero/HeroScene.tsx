@@ -75,7 +75,9 @@ export default function HeroScene() {
         onCreated={() => setReady(true)}
       >
         <AdaptiveDpr pixelated />
-        <ambientLight intensity={0.25} />
+        <ambientLight intensity={0.5} />
+        <directionalLight position={[4, 6, 6]} intensity={1.4} color="#F2F5F8" />
+        <directionalLight position={[-6, -2, 4]} intensity={0.5} color="#8B97A3" />
 
         <ParallaxGroup>
           {/* Kahraman cıvata — başlığın sağında */}
@@ -95,16 +97,19 @@ export default function HeroScene() {
             <Screw position={[4.6, -1.3, -1.8]} rotation={[-0.5, 0.2, 0.9]} scale={1.05} />
           </Float>
           <Float speed={0.5} rotationIntensity={0.4} floatIntensity={0.5}>
-            <Nut position={[-4.6, -2.1, -3]} rotation={[0.4, 0.8, 0.1]} scale={0.7} />
+            <Nut position={[-7.2, -3.6, -5]} rotation={[0.4, 0.8, 0.1]} scale={0.8} />
           </Float>
         </ParallaxGroup>
 
         {/* HDR dosyası yerine Lightformer'lı stüdyo ortamı — yük ~0 */}
         <Environment resolution={256}>
-          <Lightformer intensity={2.2} position={[0, 4, 5]} scale={[9, 1.4, 1]} color="#E6EAEE" />
-          <Lightformer intensity={1.1} position={[-6, -1, 3]} rotation-y={0.6} scale={[6, 2, 1]} color="#AEB6C0" />
-          <Lightformer intensity={0.9} position={[6, 1, -3]} rotation-y={-0.7} scale={[6, 2.5, 1]} color="#7E8996" />
-          <Lightformer intensity={0.5} position={[0, -5, 0]} rotation-x={Math.PI / 2} scale={[10, 4, 1]} color="#39424C" />
+          {/* tepe ışık şeridi — fırçalanmış metal parlaması */}
+          <Lightformer intensity={6} position={[0, 4, 5]} scale={[10, 2, 1]} color="#FFFFFF" />
+          {/* ön dolgu — kameradan gelen yumuşak yansıma */}
+          <Lightformer intensity={3} position={[0, 0, 8]} scale={[12, 6, 1]} color="#DFE5EA" />
+          <Lightformer intensity={2.5} position={[-6, -1, 3]} rotation-y={0.6} scale={[7, 3, 1]} color="#C7CFD7" />
+          <Lightformer intensity={2} position={[6, 1, -3]} rotation-y={-0.7} scale={[7, 3.5, 1]} color="#9AA5B1" />
+          <Lightformer intensity={1} position={[0, -5, 0]} rotation-x={Math.PI / 2} scale={[10, 5, 1]} color="#4A5561" />
         </Environment>
       </Canvas>
     </div>
