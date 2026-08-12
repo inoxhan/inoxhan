@@ -3,10 +3,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Paperclip, X, Zap } from "lucide-react";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { QuoteSuccess } from "@/components/quote/QuoteSuccess";
 import { Button } from "@/components/ui/Button";
+import { track } from "@/lib/analytics-client";
 import { QUOTE_UNITS } from "@/lib/constants";
 import type { z } from "zod";
 import {
@@ -64,6 +65,18 @@ export function QuoteForm({ preselected, source = "form" }: QuoteFormProps) {
   const [fileError, setFileError] = useState<string | null>(null);
   const [productLocked, setProductLocked] = useState(Boolean(preselected));
   const fileRef = useRef<HTMLInputElement>(null);
+  const submittedRef = useRef(false);
+
+  // form_open (mount) + form_abandon (gönderilmeden sayfadan ayrılma)
+  useEffect(() => {
+    track("form_open", { source, sku: preselected?.sku ?? "" });
+    const onPageHide = () => {
+      if (!submittedRef.current) track("form_abandon", { source });
+    };
+    window.addEventListener("pagehide", onPageHide);
+    return () => window.removeEventListener("pagehide", onPageHide);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const {
     register,
@@ -122,6 +135,8 @@ export function QuoteForm({ preselected, source = "form" }: QuoteFormProps) {
 
     const res = await submitQuote(fd);
     if (res.ok) {
+      submittedRef.current = true;
+      track("form_submit", { source, sku: values.productSku ?? "" });
       setDone(res.quoteId);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {

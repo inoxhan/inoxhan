@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { AnalyticsListener } from "@/components/AnalyticsListener";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { FloatingQuoteButton } from "@/components/layout/FloatingQuoteButton";
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main className="flex-1">{children}</main>
         <Footer />
         <FloatingQuoteButton whatsappNumber={whatsappNumber} />
+        <AnalyticsListener />
       </body>
     </html>
   );

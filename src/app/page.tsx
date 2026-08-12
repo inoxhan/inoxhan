@@ -65,6 +65,8 @@ export default async function HomePage() {
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Link
               href="/teklif?kaynak=hero"
+              data-track="quote_button_click"
+              data-track-payload='{"where":"hero"}'
               className={buttonStyles({ variant: "metallic", size: "lg" })}
             >
               <Zap className="size-5" aria-hidden />
@@ -150,6 +152,8 @@ export default async function HomePage() {
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <Link
                 href="/teklif?kaynak=hero"
+                data-track="quote_button_click"
+                data-track-payload='{"where":"final-cta"}'
                 className={buttonStyles({ variant: "metallic", size: "lg" })}
               >
                 <Zap className="size-5" aria-hidden />
@@ -160,6 +164,8 @@ export default async function HomePage() {
                   href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Merhaba, teklif almak istiyorum.")}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  data-track="whatsapp_click"
+                  data-track-payload='{"where":"final-cta"}'
                   className={buttonStyles({ variant: "ghost-dark", size: "lg" })}
                 >
                   WhatsApp&apos;tan Yaz

@@ -6,6 +6,7 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { ImageGallery } from "@/components/catalog/ImageGallery";
 import { SpecTable } from "@/components/catalog/SpecTable";
 import { buttonStyles } from "@/components/ui/Button";
+import { SITE } from "@/lib/constants";
 import { getProductBySlug } from "@/server/catalog";
 import { getSetting } from "@/server/settings";
 
@@ -22,11 +23,21 @@ export async function generateMetadata({
   const { slug } = await params;
   const product = await getProductBySlug(slug);
   if (!product) return {};
+  const title = product.seoTitle ?? `${product.name} — ${product.brand?.name ?? ""}`.trim();
+  const description =
+    product.seoDesc ??
+    `${product.name} teknik özellikleri. Fiyat için teklif isteyin — en geç 1 saat içinde dönüş.`;
+  const image = product.images[0] ? `/${product.images[0].basePath}-lg.webp` : undefined;
   return {
-    title: product.seoTitle ?? `${product.name} — ${product.brand?.name ?? ""}`.trim(),
-    description:
-      product.seoDesc ??
-      `${product.name} teknik özellikleri. Fiyat için teklif isteyin — en geç 1 saat içinde dönüş.`,
+    title,
+    description,
+    alternates: { canonical: `/urunler/${product.category.slug}/${product.slug}` },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      ...(image && { images: [{ url: image, width: 1600, height: 1200 }] }),
+    },
   };
 }
 
@@ -51,8 +62,47 @@ export default async function UrunDetayPage({ params }: { params: Promise<Params
       )}`
     : null;
 
+  // schema.org yapılandırılmış veri — fiyat/stok alanları BİLİNÇLİ olarak yok
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    sku: product.sku,
+    ...(product.model && { mpn: product.model }),
+    ...(product.brand && { brand: { "@type": "Brand", name: product.brand.name } }),
+    ...(product.shortDesc && { description: product.shortDesc }),
+    ...(product.images[0] && {
+      image: `${SITE.url}/${product.images[0].basePath}-lg.webp`,
+    }),
+    category: product.category.name,
+    url: `${SITE.url}/urunler/${product.category.slug}/${product.slug}`,
+  };
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Ana Sayfa", item: SITE.url },
+      { "@type": "ListItem", position: 2, name: "Ürünler", item: `${SITE.url}/urunler` },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: product.category.name,
+        item: `${SITE.url}/urunler/${product.category.slug}`,
+      },
+      { "@type": "ListItem", position: 4, name: product.name },
+    ],
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 md:py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Breadcrumbs
         items={[
           { label: "Ürünler", href: "/urunler" },
@@ -83,6 +133,8 @@ export default async function UrunDetayPage({ params }: { params: Promise<Params
           <div className="mt-8 rounded-lg border border-steel-200 bg-white p-5 shadow-card">
             <Link
               href={quoteHref}
+              data-track="quote_button_click"
+              data-track-payload={JSON.stringify({ where: "detail", sku: product.sku })}
               className={buttonStyles({ variant: "metallic", size: "lg", className: "w-full" })}
             >
               <Zap className="size-5" aria-hidden />
@@ -93,6 +145,8 @@ export default async function UrunDetayPage({ params }: { params: Promise<Params
                 href={waHref}
                 target="_blank"
                 rel="noopener noreferrer"
+                data-track="whatsapp_click"
+                data-track-payload={JSON.stringify({ where: "detail", sku: product.sku })}
                 className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-md border border-[#25D366]/40 bg-[#25D366]/10 font-medium text-[#128C4A] transition-colors hover:bg-[#25D366]/20"
               >
                 <MessageCircle className="size-5" aria-hidden />

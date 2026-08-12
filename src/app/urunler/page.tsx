@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Ürün Kütüphanesi",
   description:
     "Hırdavat ve bağlantı elemanlarında yüzlerce ürün. Aradığınızı bulun, tek tıkla teklif isteyin.",
+  alternates: { canonical: "/urunler" },
 };
 
 interface SearchParams {

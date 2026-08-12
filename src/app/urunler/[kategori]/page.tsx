@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { TrackOnMount } from "@/components/AnalyticsListener";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CatalogSearch } from "@/components/catalog/CatalogSearch";
 import { FilterPanel } from "@/components/catalog/FilterPanel";
@@ -31,6 +32,7 @@ export async function generateMetadata({
   return {
     title: `${category.name}`,
     description: `${category.name} kategorisindeki ürünler — teknik özellikleriyle inceleyin, 1 saat içinde teklif alın.`,
+    alternates: { canonical: `/urunler/${category.slug}` },
   };
 }
 
@@ -63,6 +65,7 @@ export default async function KategoriPage({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 md:py-16">
+      <TrackOnMount type="category_view" payload={{ category: category.slug }} />
       <Breadcrumbs
         items={[{ label: "Ürünler", href: "/urunler" }, { label: category.name }]}
       />

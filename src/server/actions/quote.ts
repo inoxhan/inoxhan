@@ -1,10 +1,12 @@
 "use server";
 
+import { headers } from "next/headers";
 import { normalizePhoneTr } from "@/lib/phone";
 import { quoteSchema, validateProductPresence } from "@/lib/quote-schema";
 import { postQuoteToCrm } from "@/server/crm-webhook";
 import { db } from "@/server/db";
 import { sendQuoteNotification } from "@/server/email";
+import { rateLimit } from "@/server/rate-limit";
 import { saveQuoteAttachment } from "@/server/storage";
 
 export type SubmitQuoteResult =
@@ -17,6 +19,16 @@ export type SubmitQuoteResult =
  * ek dosya → e-posta + CRM bildirimi (hata verse de talep kaydı korunur).
  */
 export async function submitQuote(formData: FormData): Promise<SubmitQuoteResult> {
+  // Kötüye kullanım koruması: IP başına dakikada 5 talep
+  const h = await headers();
+  const ip = (h.get("x-forwarded-for") ?? "local").split(",")[0].trim();
+  if (!rateLimit(`quote:${ip}`, { capacity: 5, refillPerMinute: 5 })) {
+    return {
+      ok: false,
+      message: "Çok fazla deneme yapıldı — lütfen bir dakika sonra tekrar deneyin",
+    };
+  }
+
   const raw = {
     name: String(formData.get("name") ?? ""),
     company: String(formData.get("company") ?? ""),
@@ -138,9 +150,20 @@ export async function submitQuote(formData: FormData): Promise<SubmitQuoteResult
     source: values.source || "form",
   };
 
+  // Sunucu taraflı analitik — hangi üründen teklif istendi (kişisel veri YOK)
   const results = await Promise.allSettled([
     sendQuoteNotification(notification),
     postQuoteToCrm(crmPayload),
+    db.analyticsEvent.create({
+      data: {
+        type: "product_quote_requested",
+        payload: JSON.stringify({
+          sku: product?.sku ?? "",
+          freeText: product ? "" : (values.productText ?? "").slice(0, 120),
+          source: values.source || "form",
+        }),
+      },
+    }),
   ]);
   for (const r of results) {
     if (r.status === "rejected") console.error("Teklif bildirimi hatası:", r.reason);

@@ -61,7 +61,9 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             Detayları Gör
           </Link>
           <Link
-            href={`/teklif?urun=${encodeURIComponent(product.sku)}`}
+            href={`/teklif?urun=${encodeURIComponent(product.sku)}&kaynak=product`}
+            data-track="quote_button_click"
+            data-track-payload={JSON.stringify({ where: "card", sku: product.sku })}
             className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-md bg-steel-950 text-sm font-medium text-steel-50 transition-colors hover:bg-steel-800"
           >
             <Zap className="size-4" aria-hidden />

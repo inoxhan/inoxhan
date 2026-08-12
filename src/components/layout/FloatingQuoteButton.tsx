@@ -34,6 +34,8 @@ export function FloatingQuoteButton({ whatsappNumber }: { whatsappNumber: string
             href={waHref}
             target="_blank"
             rel="noopener noreferrer"
+            data-track="whatsapp_click"
+            data-track-payload='{"where":"floating"}'
             className="flex size-12 items-center justify-center rounded-full border border-steel-200 bg-white text-[#25D366] shadow-elevated transition-transform hover:scale-105"
             aria-label="WhatsApp'tan Teklif Al"
           >
@@ -41,7 +43,9 @@ export function FloatingQuoteButton({ whatsappNumber }: { whatsappNumber: string
           </a>
         )}
         <Link
-          href="/teklif"
+          href="/teklif?kaynak=floating"
+          data-track="quote_button_click"
+          data-track-payload='{"where":"floating"}'
           className="gradient-steel flex h-13 items-center gap-2 rounded-full px-6 font-medium text-steel-950 shadow-elevated transition-all hover:brightness-105"
         >
           <Zap className="size-5" aria-hidden />
@@ -57,7 +61,9 @@ export function FloatingQuoteButton({ whatsappNumber }: { whatsappNumber: string
         )}
       >
         <Link
-          href="/teklif"
+          href="/teklif?kaynak=floating"
+          data-track="quote_button_click"
+          data-track-payload='{"where":"floating-mobile"}'
           className="gradient-steel flex h-12 flex-1 items-center justify-center gap-2 rounded-md font-medium text-steel-950"
         >
           <Zap className="size-5" aria-hidden />
@@ -68,6 +74,8 @@ export function FloatingQuoteButton({ whatsappNumber }: { whatsappNumber: string
             href={waHref}
             target="_blank"
             rel="noopener noreferrer"
+            data-track="whatsapp_click"
+            data-track-payload='{"where":"floating-mobile"}'
             className="flex size-12 items-center justify-center rounded-md border border-steel-200 text-[#25D366]"
             aria-label="WhatsApp'tan Teklif Al"
           >

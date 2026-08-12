@@ -9,6 +9,7 @@ import {
   searchProducts,
   type SearchIndexItem,
 } from "@/lib/search-client";
+import { track } from "@/lib/analytics-client";
 
 /**
  * Katalog arama kabuğu: yazmaya başlayınca sunucu ızgarasını (children)
@@ -46,8 +47,11 @@ export function CatalogSearch({ children }: { children: ReactNode }) {
         setResults(searchProducts(miniRef.current, q));
       }
     });
+    // arama terimi analitiği — yazma durunca tek olay
+    const t = setTimeout(() => track("search_query", { q: q.slice(0, 80) }), 1200);
     return () => {
       cancelled = true;
+      clearTimeout(t);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
