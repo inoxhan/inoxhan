@@ -12,8 +12,14 @@ import { cn } from "@/lib/utils";
  */
 export function FloatingQuoteButton({ whatsappNumber }: { whatsappNumber: string }) {
   const pathname = usePathname();
-  // Panel ekranlarında ve teklif sayfasının kendisinde gösterme
-  if (pathname.startsWith("/panel") || pathname.startsWith("/teklif")) return null;
+  // Panel, teklif sayfası ve PDF baskı düzeninde gösterme
+  if (
+    pathname.startsWith("/panel") ||
+    pathname.startsWith("/teklif") ||
+    pathname.startsWith("/katalog-baski")
+  ) {
+    return null;
+  }
 
   const waHref = whatsappNumber
     ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Merhaba, teklif almak istiyorum.")}`
