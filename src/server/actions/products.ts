@@ -13,6 +13,7 @@ export interface ProductFormState {
 
 function revalidateCatalog() {
   revalidateTag("search-index", "max");
+  revalidatePath("/", "layout"); // ana sayfa sayaç ve vitrinleri
   revalidatePath("/urunler", "layout");
   revalidatePath("/panel/urunler");
 }

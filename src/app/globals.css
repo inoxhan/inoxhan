@@ -38,6 +38,7 @@
   --shadow-elevated: 0 8px 30px rgb(11 13 16 / 0.12);
 
   --animate-sheen: sheen 2.6s ease-in-out infinite;
+  --animate-kenburns: kenburns 5.5s ease-out forwards;
 
   @keyframes sheen {
     0%,
@@ -46,6 +47,26 @@
     }
     100% {
       transform: translateX(220%) skewX(-18deg);
+    }
+  }
+
+  @keyframes kenburns {
+    from {
+      transform: scale(1) translate(0, 0);
+    }
+    to {
+      transform: scale(1.12) translate(-1.5%, -1%);
+    }
+  }
+
+  @keyframes fadeup {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 }
