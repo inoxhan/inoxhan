@@ -1,33 +1,56 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CatalogSearch } from "@/components/catalog/CatalogSearch";
 import { FilterPanel } from "@/components/catalog/FilterPanel";
 import { Pagination } from "@/components/catalog/Pagination";
 import { ProductGrid } from "@/components/catalog/ProductGrid";
-import { getBrands, getCategories, getProducts } from "@/server/catalog";
+import {
+  getBrands,
+  getCategories,
+  getCategoryBySlug,
+  getProducts,
+} from "@/server/catalog";
 
-export const metadata: Metadata = {
-  title: "Ürün Kütüphanesi",
-  description:
-    "Hırdavat ve bağlantı elemanlarında yüzlerce ürün. Aradığınızı bulun, tek tıkla teklif isteyin.",
-};
-
+interface Params {
+  kategori: string;
+}
 interface SearchParams {
   marka?: string;
   sayfa?: string;
 }
 
-export default async function UrunlerPage({
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<Params>;
+}): Promise<Metadata> {
+  const { kategori } = await params;
+  const category = await getCategoryBySlug(kategori);
+  if (!category) return {};
+  return {
+    title: `${category.name}`,
+    description: `${category.name} kategorisindeki ürünler — teknik özellikleriyle inceleyin, 1 saat içinde teklif alın.`,
+  };
+}
+
+export default async function KategoriPage({
+  params,
   searchParams,
 }: {
+  params: Promise<Params>;
   searchParams: Promise<SearchParams>;
 }) {
+  const { kategori } = await params;
   const sp = await searchParams;
-  const page = Number(sp.sayfa) || 1;
+  const category = await getCategoryBySlug(kategori);
+  if (!category) notFound();
 
+  const page = Number(sp.sayfa) || 1;
   const [categories, brands, result] = await Promise.all([
     getCategories(),
     getBrands(),
-    getProducts({ brandSlug: sp.marka, page }),
+    getProducts({ categorySlug: kategori, brandSlug: sp.marka, page }),
   ]);
 
   const makeHref = (p: number) => {
@@ -35,17 +58,21 @@ export default async function UrunlerPage({
     if (sp.marka) q.set("marka", sp.marka);
     if (p > 1) q.set("sayfa", String(p));
     const qs = q.toString();
-    return `/urunler${qs ? `?${qs}` : ""}`;
+    return `/urunler/${kategori}${qs ? `?${qs}` : ""}`;
   };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 md:py-16">
-      <header className="mb-10 text-center">
-        <h1 className="font-display text-4xl font-bold tracking-tight text-steel-900 md:text-5xl">
-          Ürün Kütüphanesi
+      <Breadcrumbs
+        items={[{ label: "Ürünler", href: "/urunler" }, { label: category.name }]}
+      />
+
+      <header className="mt-6 mb-10">
+        <h1 className="font-display text-4xl font-bold tracking-tight text-steel-900">
+          {category.name}
         </h1>
-        <p className="mt-3 text-lg text-steel-500">
-          {result.total} ürün · Fiyat sormak için tek tık yeter
+        <p className="mt-2 text-lg text-steel-500">
+          {result.total} ürün · Teknik özellikleriyle inceleyin, tek tıkla teklif isteyin
         </p>
       </header>
 
@@ -62,6 +89,7 @@ export default async function UrunlerPage({
               slug: b.slug,
               count: b._count.products,
             }))}
+            activeCategorySlug={kategori}
             activeBrandSlug={sp.marka}
           />
           <ProductGrid products={result.items} />
