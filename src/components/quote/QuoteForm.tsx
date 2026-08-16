@@ -360,7 +360,7 @@ export function QuoteForm({
         {isSubmitting ? "Gönderiliyor…" : "Teklif Talebini Gönder"}
       </Button>
       <p className="text-center text-sm text-steel-500">
-        Ortalama tamamlama süresi 45 saniye · En geç 1 saat içinde dönüş
+        Ortalama tamamlama süresi 45 saniye · 15-30 dakika içinde dönüş
       </p>
     </form>
   );

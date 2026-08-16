@@ -7,7 +7,7 @@ import { getSetting } from "@/server/settings";
 export const metadata: Metadata = {
   title: "Hızlı Teklif Al",
   description:
-    "İhtiyacını gönder, en geç 1 saat içinde sana özel rekabetçi teklifini al.",
+    "İhtiyacını gönder, 15-30 dakika içinde sana özel rekabetçi teklifini al.",
 };
 
 interface SearchParams {
@@ -55,9 +55,9 @@ export default async function TeklifPage({
                 <Clock className="size-5" aria-hidden />
               </span>
               <div>
-                <p className="font-semibold text-steel-900">≤ 1 Saat</p>
+                <p className="font-semibold text-steel-900">15-30 Dakika</p>
                 <p className="text-sm text-steel-500">
-                  Talebine en geç 1 saat içinde dönüş yapıyoruz.
+                  Talebine 15-30 dakika içinde dönüş yapıyoruz.
                 </p>
               </div>
             </li>

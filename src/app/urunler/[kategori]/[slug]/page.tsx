@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { Clock, FileText, MessageCircle } from "lucide-react";
+import { Clock, FileText, Maximize2, MessageCircle } from "lucide-react";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { ImageGallery } from "@/components/catalog/ImageGallery";
+import { ProductImage } from "@/components/catalog/ProductImage";
 import { QualityPicker } from "@/components/catalog/QualityPicker";
 import { SpecTable } from "@/components/catalog/SpecTable";
 import { SITE } from "@/lib/constants";
@@ -26,8 +26,22 @@ export async function generateMetadata({
   const title = product.seoTitle ?? `${product.name} — ${product.brand?.name ?? ""}`.trim();
   const description =
     product.seoDesc ??
-    `${product.name} teknik özellikleri. Fiyat için teklif isteyin — en geç 1 saat içinde dönüş.`;
-  const image = product.images[0] ? `/${product.images[0].basePath}-lg.webp` : undefined;
+    `${product.name} teknik özellikleri. Fiyat için teklif isteyin — 15-30 dakika içinde dönüş.`;
+  // ProductImage satırındaki width/height KAYNAĞIN ölçüsüdür, türevin değil. OG'ye
+  // gerçekte servis edilen `-lg` türevinin ölçüsü bildirilir: `IMAGE_VARIANTS.lg` 1600 px'te
+  // sınırlıyor, ama `withoutEnlargement` yüzünden daha dar kaynak olduğu gibi kalıyor.
+  // Sabit 1600×1200 bildirmek kare (1254×1254) fotoğraflarda önizlemeyi bozuyordu.
+  const ana = product.images[0];
+  const ogGenislik = ana && ana.width > 0 ? Math.min(1600, ana.width) : 0;
+  const ogGorsel =
+    ana && ogGenislik > 0
+      ? {
+          url: `/${ana.basePath}-lg.webp`,
+          width: ogGenislik,
+          height: Math.round((ana.height * ogGenislik) / ana.width),
+        }
+      : undefined;
+
   return {
     title,
     description,
@@ -36,7 +50,7 @@ export async function generateMetadata({
       title,
       description,
       type: "website",
-      ...(image && { images: [{ url: image, width: 1600, height: 1200 }] }),
+      ...(ogGorsel && { images: [ogGorsel] }),
     },
   };
 }
@@ -55,6 +69,10 @@ export default async function UrunDetayPage({ params }: { params: Promise<Params
   const subtitle = [product.brand?.name, product.model].filter(Boolean).join(" · ");
   const useAreas =
     product.useAreas?.split(",").map((s) => s.trim()).filter(Boolean) ?? [];
+
+  // Katalog PDF'inden çıkarılan görseller — ürün fotoğrafından ayrı, galeride görünmez
+  const drawing = product.drawings.find((d) => d.kind === "cizim");
+  const dimensionTable = product.drawings.find((d) => d.kind === "tablo");
 
   const whatsappNumber = await getSetting("whatsapp_number", process.env.WHATSAPP_NUMBER);
   const waHref = whatsappNumber
@@ -145,20 +163,9 @@ export default async function UrunDetayPage({ params }: { params: Promise<Params
             )}
             <p className="mt-3 flex items-center justify-center gap-1.5 text-sm text-steel-500">
               <Clock className="size-4 text-signal" aria-hidden />
-              En geç 1 saat içinde size dönüş yapıyoruz
+              15-30 dakika içinde size dönüş yapıyoruz
             </p>
           </div>
-
-          {product.specs.length > 0 && (
-            <section className="mt-10">
-              <h2 className="font-display text-xl font-semibold text-steel-900">
-                Teknik Özellikler
-              </h2>
-              <div className="mt-4 rounded-lg border border-steel-200 bg-white px-5 py-2">
-                <SpecTable specs={product.specs} />
-              </div>
-            </section>
-          )}
 
           {useAreas.length > 0 && (
             <section className="mt-8">
@@ -200,6 +207,70 @@ export default async function UrunDetayPage({ params }: { params: Promise<Params
           )}
         </div>
       </div>
+
+      {/* Teknik Özellikler — ızgaranın altında TAM GENİŞLİK. Ölçü tabloları 20 satır ×
+          12 sütuna kadar çıkıyor; sağ sütunun ~600 px'ine sığdırıldığında okunmuyor. */}
+      {(product.specs.length > 0 || product.drawings.length > 0) && (
+        <section className="mt-14">
+          <h2 className="font-display text-2xl font-semibold tracking-tight text-steel-900">
+            Teknik Özellikler
+          </h2>
+
+          {/* items-start: spec kartı çizim kartının boyuna gerilip altında boşluk bırakmasın */}
+          <div className="mt-5 grid items-start gap-6 lg:grid-cols-5">
+            {product.specs.length > 0 && (
+              <div className="rounded-lg border border-steel-200 bg-white px-5 py-2 shadow-card lg:col-span-2">
+                <SpecTable specs={product.specs} />
+              </div>
+            )}
+
+            {drawing && (
+              <figure className="rounded-lg border border-steel-200 bg-white p-5 shadow-card lg:col-span-3">
+                <ProductImage
+                  basePath={drawing.basePath}
+                  alt={drawing.alt}
+                  sizes="(max-width: 1024px) 92vw, 55vw"
+                  className="mx-auto w-full max-w-2xl"
+                />
+                <figcaption className="mt-3 text-center text-xs text-steel-500">
+                  Ölçülendirilmiş teknik çizim · {product.sku}
+                </figcaption>
+              </figure>
+            )}
+          </div>
+
+          {dimensionTable && (
+            <div className="mt-6 rounded-lg border border-steel-200 bg-white p-5 shadow-card">
+              <div className="flex items-baseline justify-between gap-4">
+                <h3 className="font-display text-base font-semibold text-steel-900">
+                  Ölçü Tablosu
+                </h3>
+                <a
+                  href={`/${dimensionTable.basePath}-full.webp`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex shrink-0 items-center gap-1.5 text-sm text-steel-600 underline-offset-4 hover:underline"
+                >
+                  <Maximize2 className="size-4 text-steel-400" aria-hidden />
+                  Büyüt
+                </a>
+              </div>
+              {/* Dar ekranda küçültmek yerine yatay kaydırılır — rakamlar okunur kalsın */}
+              <div className="mt-4 overflow-x-auto">
+                <ProductImage
+                  basePath={dimensionTable.basePath}
+                  alt={dimensionTable.alt}
+                  sizes="(max-width: 1280px) 1200px, 1200px"
+                  className="w-full min-w-[760px]"
+                />
+              </div>
+              <p className="mt-3 text-xs text-steel-500">
+                Değerler milimetre cinsindendir. Kaynak: İnoxhan ürün kataloğu.
+              </p>
+            </div>
+          )}
+        </section>
+      )}
     </div>
   );
 }

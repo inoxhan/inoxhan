@@ -21,12 +21,17 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-steel-800 bg-steel-950/90 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-        <Link
-          href="/"
-          className="font-display text-xl font-bold tracking-wide text-steel-50"
-          onClick={() => setOpen(false)}
-        >
-          İNOX<span className="text-steel-400">HAN</span>
+        <Link href="/" className="flex items-center" onClick={() => setOpen(false)}>
+          {/* Saydam zeminli kurumsal logo (scripts/hazirla-logo.ts üretir).
+              next/image kullanılmaz — türev zaten optimize, tek dosya. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/media/brand/inoxhan-logo-sm.webp"
+            alt="İnoxhan"
+            width={185}
+            height={32}
+            className="h-8 w-auto"
+          />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">

@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ProductImage } from "@/components/catalog/ProductImage";
 import { buttonStyles } from "@/components/ui/Button";
+import { medyaVar } from "@/server/sayfa-medya";
 
 export const metadata: Metadata = {
   title: "İletişim",
   description: "İnoxhan iletişim bilgileri ve hızlı teklif kanalları.",
 };
+
+const GORSEL = "media/sayfa/iletisim";
 
 export default function IletisimPage() {
   return (
@@ -14,7 +18,7 @@ export default function IletisimPage() {
         İletişim
       </h1>
       <p className="mt-4 text-lg text-steel-600">
-        En hızlı dönüş için teklif formunu kullanabilirsiniz — en geç 1 saat
+        En hızlı dönüş için teklif formunu kullanabilirsiniz — 15-30 dakika
         içinde size ulaşıyoruz.
       </p>
       <div className="mt-8">
@@ -22,6 +26,14 @@ export default function IletisimPage() {
           Hemen Teklif Al
         </Link>
       </div>
+      {medyaVar(GORSEL) && (
+        <ProductImage
+          basePath={GORSEL}
+          alt="Fırçalanmış paslanmaz yüzey üzerinde tek bir cıvata"
+          sizes="(max-width: 768px) 100vw, 768px"
+          className="mt-12 aspect-[3/2] w-full rounded-lg bg-photo object-cover"
+        />
+      )}
       {/* İletişim bilgileri (adres, telefon, harita) firma bilgileri geldiğinde eklenecek */}
     </div>
   );

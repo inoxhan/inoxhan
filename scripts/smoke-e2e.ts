@@ -3,8 +3,8 @@
  *   npx tsx scripts/smoke-e2e.ts [screenshotDir]
  *
  * Kontroller:
- *  1. Desktop ana sayfa: 3D canvas mount olur, konsol hatası yok
- *  2. Mobil ana sayfa: canvas MOUNT OLMAZ (poster yolu), konsol hatası yok
+ *  1. Desktop ana sayfa: hero videosu mount olur, konsol hatası yok
+ *  2. Mobil ana sayfa: video MOUNT OLMAZ (poster yolu), konsol hatası yok
  *  3. Katalog: toleranslı arama "cıvta" sonuç bulur
  *  4. Panel: yanlış şifre reddedilir, doğru şifre girer, SLA kırmızı satır görünür
  *  5. Teklif formu: ürün ön-seçimli gönderim → "Talebin Alındı!"
@@ -15,6 +15,9 @@ import { chromium, devices } from "playwright";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const SHOT_DIR = process.argv[2] ?? path.join(process.cwd(), "storage", "smoke");
+
+/** Hero slider'ı — showreel de bir karusel olduğu için aria-label ile ayrılır. */
+const HERO = 'section[aria-label="İnoxhan tanıtım slaytları"]';
 
 function env(key: string): string {
   const m = readFileSync(path.join(process.cwd(), ".env"), "utf8").match(
@@ -42,9 +45,11 @@ async function main() {
       if (m.type() === "error") errors.push(m.text());
     });
     await page.goto(BASE, { waitUntil: "networkidle" });
-    await page.waitForTimeout(2500); // 3D lazy chunk
-    const canvas = await page.locator("canvas").count();
-    check("desktop: 3D canvas mount edildi", canvas >= 1, `${canvas} canvas`);
+    await page.waitForTimeout(2500); // hidrasyon + hero medyası
+    // Aktif slaytın arka plan katmanı: klip üretildiyse <video>, üretilmediyse poster
+    // görseli (bkz. src/app/page.tsx → heroSlaytlari). İkisi de yoksa hero boş demektir.
+    const medya = await page.locator(`${HERO} img, ${HERO} video`).count();
+    check("desktop: hero medyası mount edildi", medya >= 1, `${medya} öğe`);
     check("desktop: konsol hatası yok", errors.length === 0, errors.slice(0, 3).join(" | "));
     await page.screenshot({ path: path.join(SHOT_DIR, "home-desktop.png") });
     await page.evaluate(() => window.scrollTo(0, 1200));
@@ -61,8 +66,14 @@ async function main() {
     page.on("pageerror", (e) => errors.push(e.message));
     await page.goto(BASE, { waitUntil: "networkidle" });
     await page.waitForTimeout(1500);
-    const canvas = await page.locator("canvas").count();
-    check("mobil: canvas mount EDİLMEDİ (poster yolu)", canvas === 0, `${canvas} canvas`);
+    // Mobilde hero videosu HİÇ indirilmez, yerine dikey poster türevi gösterilir.
+    const video = await page.locator(`${HERO} video`).count();
+    const poster = await page.locator(`${HERO} img`).count();
+    check(
+      "mobil: video mount EDİLMEDİ (poster yolu)",
+      video === 0 && poster >= 1,
+      `${video} video / ${poster} görsel`,
+    );
     check("mobil: konsol hatası yok", errors.length === 0, errors.slice(0, 3).join(" | "));
     const bars = await page.locator('a:has-text("Hızlı Teklif Al")').all();
     let barVisible = false;

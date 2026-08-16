@@ -49,3 +49,7 @@ prisma/*.db*
 # Kaynak urun fotograflari (~70 MB). Islenmis AVIF/WebP turevleri
 # public/media/products altinda ve depoya dahildir.
 resimler ve açıklamalar/
+
+# Higgsfield ham uretimleri (~300 MB) - islenmis turevler public/media altinda
+tanıtımvideoları/
+

@@ -16,15 +16,20 @@
  * SOURCE_DIRS listesine eklenerek aynı yolla içe aktarılır.
  */
 import { existsSync } from "node:fs";
-import { readdir, readFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { PrismaClient } from "@prisma/client";
-import { lowerCaseTr, slugifyTr, titleCaseTr } from "../src/lib/slugify-tr";
+import { lowerCaseTr, slugifyTr } from "../src/lib/slugify-tr";
 import { processProductImage } from "../src/server/media";
+import {
+  collectFiles,
+  parseFileName,
+  SOURCE_DIRS,
+  type ParsedProduct,
+} from "./lib/urun-dosyalari";
 
 const db = new PrismaClient();
 
-const SOURCE_DIRS = ["resimler ve açıklamalar"];
 const DRY = process.argv.includes("--dry");
 const FORCE = process.argv.includes("--force");
 
@@ -48,56 +53,6 @@ const CATEGORIES: { name: string; order: number; files: number[]; coverFile: num
   { name: "Gijon ve Zincir", order: 8, coverFile: 28, files: [28, 55] },
 ];
 
-interface ParsedProduct {
-  fileNo: number;
-  filePath: string;
-  name: string; // "INOX Altıköşe Başlı Metrik Diş Tam Paso Cıvata"
-  sku: string; // "DIN 933"
-  din: string | null;
-  iso: string | null;
-  globalName: string | null; // norm yoksa "Drop In Anchor"
-}
-
-/**
- * "21 - INOX ALTIKÖŞE ... - DIN 933 - ISO 4017" biçimini parçalarına ayırır.
- * Ad ile norm(lar) " - " ile ayrılmıştır; normlar sondadır.
- */
-function parseFileName(filePath: string): ParsedProduct | null {
-  const base = path.basename(filePath, path.extname(filePath));
-  const parts = base.split(" - ").map((p) => p.trim());
-  if (parts.length < 2) return null;
-
-  const fileNo = Number(parts[0]);
-  if (!Number.isFinite(fileNo)) return null;
-
-  let din: string | null = null;
-  let iso: string | null = null;
-  const nameParts: string[] = [];
-  const extraParts: string[] = [];
-
-  for (const part of parts.slice(1)) {
-    if (/^DIN\s/i.test(part)) din = part.toUpperCase();
-    else if (/^ISO\s/i.test(part)) iso = part.toUpperCase();
-    else if (nameParts.length === 0) nameParts.push(part);
-    else extraParts.push(part); // "DROP IN ANCHOR" gibi norm olmayan ek ad
-  }
-  if (nameParts.length === 0) return null;
-
-  const globalName = extraParts.length > 0 ? titleCaseTr(extraParts.join(" ")) : null;
-  const sku = din ?? iso ?? extraParts.join(" ").toUpperCase();
-  if (!sku) return null;
-
-  return {
-    fileNo,
-    filePath,
-    name: titleCaseTr(nameParts[0]),
-    sku,
-    din,
-    iso,
-    globalName,
-  };
-}
-
 /** Ürün adının ve normunun düz ifadesi — uydurma bilgi içermez. */
 function buildDescription(p: ParsedProduct): string {
   // "INOX Altıköşe Başlı ..." → "altıköşe başlı ..." (cümle içinde akıcı olsun)
@@ -107,23 +62,6 @@ function buildDescription(p: ParsedProduct): string {
   if (norms) return `${norms} normuna uygun paslanmaz çelik ${readable}.`;
   if (p.globalName) return `Paslanmaz çelik ${readable} (${p.globalName}).`;
   return `Paslanmaz çelik ${readable}.`;
-}
-
-async function collectFiles(): Promise<string[]> {
-  const files: string[] = [];
-  for (const dir of SOURCE_DIRS) {
-    const abs = path.join(process.cwd(), dir);
-    if (!existsSync(abs)) {
-      console.warn(`Klasör bulunamadı, atlanıyor: ${dir}`);
-      continue;
-    }
-    for (const entry of await readdir(abs, { withFileTypes: true })) {
-      if (entry.isFile() && /\.(png|jpe?g|webp)$/i.test(entry.name)) {
-        files.push(path.join(abs, entry.name));
-      }
-    }
-  }
-  return files.sort();
 }
 
 async function main() {

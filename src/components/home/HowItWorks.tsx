@@ -14,7 +14,7 @@ const STEPS = [
   {
     no: "03",
     title: "Teklifini Al",
-    desc: "Ekibimiz en geç 1 saat içerisinde sana özel teklifle dönüş yapar.",
+    desc: "Ekibimiz 15-30 dakika içerisinde sana özel teklifle dönüş yapar.",
   },
 ] as const;
 

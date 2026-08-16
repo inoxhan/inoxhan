@@ -44,6 +44,7 @@ model Product {
   brand      Brand?            @relation(fields: [brandId], references: [id])
   specs      ProductSpec[]
   images     ProductImage[]
+  drawings   ProductDrawing[]
   documents  ProductDocument[]
   quoteItems QuoteItem[]
   createdAt  DateTime          @default(now())
@@ -76,6 +77,24 @@ model ProductImage {
   height    Int
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([productId])
+}
+
+/// Katalog PDF'inden çıkarılan teknik çizim ve ölçü tablosu görselleri.
+/// ProductImage ile aynı `{basePath}-{sm|md|lg}.{avif|webp}` sözleşmesi + `-full.webp`
+/// (büyüt bağlantısı). Ürün fotoğrafından ayrı tutulur; galeride görünmez.
+model ProductDrawing {
+  id        String  @id @default(cuid())
+  productId String
+  kind      String // "cizim" (teknik çizim) | "tablo" (ölçü tablosu)
+  basePath  String // "media/technical/din-933-cizim"
+  alt       String
+  width     Int
+  height    Int
+  order     Int     @default(0)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, kind])
   @@index([productId])
 }
 
@@ -142,6 +161,6 @@ model AdminUser {
 }
 
 model Setting {
-  key   String @id // notify_email | whatsapp_number | crm_webhook_url | crm_webhook_secret | hero_slogan
+  key   String @id // notify_email | whatsapp_number | crm_webhook_url | crm_webhook_secret
   value String
 }

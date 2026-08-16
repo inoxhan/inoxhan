@@ -31,7 +31,7 @@ export async function generateMetadata({
   if (!category) return {};
   return {
     title: `${category.name}`,
-    description: `${category.name} kategorisindeki ürünler — teknik özellikleriyle inceleyin, 1 saat içinde teklif alın.`,
+    description: `${category.name} kategorisindeki ürünler — teknik özellikleriyle inceleyin, 15-30 dakika içinde teklif alın.`,
     alternates: { canonical: `/urunler/${category.slug}` },
   };
 }

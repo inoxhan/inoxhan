@@ -6,13 +6,18 @@ export function Footer() {
     <footer className="border-t border-steel-800 bg-steel-950 text-steel-400">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
         <div className="md:col-span-2">
-          <p className="font-display text-lg font-bold tracking-wide text-steel-50">
-            İNOX<span className="text-steel-400">HAN</span>
-          </p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/media/brand/inoxhan-logo-sm.webp"
+            alt="İnoxhan"
+            width={162}
+            height={28}
+            className="h-7 w-auto"
+          />
           <p className="mt-3 max-w-sm text-sm leading-relaxed">{SITE.tagline}</p>
           <p className="mt-4 inline-flex items-center gap-2 rounded-md border border-steel-800 px-3 py-1.5 text-xs text-steel-300">
             <span className="size-1.5 rounded-full bg-signal" aria-hidden />
-            En geç 1 saat içinde dönüş hedefi
+            15-30 dakika içinde dönüş hedefi
           </p>
         </div>
 

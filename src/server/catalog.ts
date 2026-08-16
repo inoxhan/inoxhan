@@ -64,6 +64,7 @@ export async function getProductBySlug(slug: string) {
       brand: true,
       images: { orderBy: [{ isMain: "desc" }, { order: "asc" }] },
       specs: { orderBy: { order: "asc" } },
+      drawings: { orderBy: { order: "asc" } },
       documents: true,
     },
   });

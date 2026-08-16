@@ -10,7 +10,7 @@ export function QuoteSuccess() {
         Talebin Alındı!
       </h2>
       <p className="mt-4 max-w-md text-lg leading-relaxed text-steel-600">
-        Ekibimiz talebini inceliyor. En geç <strong>1 saat</strong> içerisinde
+        Ekibimiz talebini inceliyor. <strong>15-30 dakika</strong> içerisinde
         seninle iletişime geçeceğiz.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">

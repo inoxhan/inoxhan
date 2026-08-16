@@ -31,7 +31,6 @@ async function main() {
 
   // Ayarlar panelden düzenlenir; burada yalnızca ilk değerleri konur (üzerine yazılmaz)
   const settings: [string, string][] = [
-    ["hero_slogan", "0"],
     ["whatsapp_number", process.env.WHATSAPP_NUMBER ?? ""],
     ["notify_email", process.env.NOTIFY_EMAIL ?? ""],
   ];

@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import type { SahneAdi } from "@/components/hero/HeroScene";
+import { useMediaQuery } from "@/lib/use-media-query";
 
 const HeroScene = dynamic(() => import("@/components/hero/HeroScene"), { ssr: false });
 
@@ -9,18 +10,13 @@ const HeroScene = dynamic(() => import("@/components/hero/HeroScene"), { ssr: fa
  * 3D sahneyi yalnızca uygun cihazlarda yükler:
  * masaüstü (fine pointer, ≥768px) + hareket azaltma tercihi yok.
  * Mobil ve reduced-motion'da canvas HİÇ mount edilmez → CWV etkilenmez;
- * statik poster (CSS gradyan katmanı) görünür kalır.
+ * statik poster (hero'daki CSS gradyan katmanı) görünür kalır.
  */
-export function Hero3D() {
-  const [enabled, setEnabled] = useState(false);
+export function Hero3D({ scene = "asili" }: { scene?: SahneAdi }) {
+  const finePointer = useMediaQuery("(pointer: fine)");
+  const wide = useMediaQuery("(min-width: 768px)");
+  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
-  useEffect(() => {
-    const finePointer = window.matchMedia("(pointer: fine)").matches;
-    const noReducedMotion = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const wide = window.matchMedia("(min-width: 768px)").matches;
-    if (finePointer && noReducedMotion && wide) setEnabled(true);
-  }, []);
-
-  if (!enabled) return null;
-  return <HeroScene />;
+  if (!finePointer || !wide || reducedMotion) return null;
+  return <HeroScene scene={scene} />;
 }

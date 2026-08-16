@@ -18,6 +18,7 @@ const CONFIRMED = process.argv.includes("--yes");
 /** İçeriği silinecek, kendisi kalacak klasörler */
 const CLEAR_DIRS = [
   "public/media/products",
+  "public/media/technical", // katalogdan çıkarılan teknik çizim/ölçü tablosu türevleri
   "import/fotograflar",
   "storage/uploads",
   "storage/katalog",
@@ -64,6 +65,7 @@ async function main() {
   // Katalog verisi (bağımlılık sırasıyla)
   await db.productSpec.deleteMany();
   await db.productImage.deleteMany();
+  await db.productDrawing.deleteMany();
   await db.productDocument.deleteMany();
   await db.product.deleteMany();
   await db.brand.deleteMany();
@@ -83,7 +85,9 @@ async function main() {
     await rm(path.join(process.cwd(), file), { force: true });
   }
 
-  console.log("Temizlik tamam. Sıradaki adım: npm run import:urunler");
+  console.log(
+    "Temizlik tamam. Sıradaki adımlar: npm run import:urunler && npm run import:cizim",
+  );
 }
 
 main()

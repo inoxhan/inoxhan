@@ -51,6 +51,7 @@ export default async function KatalogBaskiPage({
         include: {
           brand: true,
           images: { where: { isMain: true }, take: 1 },
+          drawings: { where: { kind: "cizim" }, take: 1 },
           specs: { orderBy: { order: "asc" }, take: 5 },
         },
       },
@@ -80,10 +81,16 @@ export default async function KatalogBaskiPage({
 
       {/* ── KAPAK ── */}
       <section className="pdf-page pdf-cover">
-        <div style={{ paddingTop: "30mm" }}>
-          <p className="font-display" style={{ fontSize: "28pt", fontWeight: 700, letterSpacing: "0.05em" }}>
-            İNOX<span style={{ color: "#8B97A3" }}>HAN</span>
-          </p>
+        <div style={{ paddingTop: "24mm" }}>
+          {/* Saydam zeminli kurumsal logo — koyu kapak üzerinde metalik okunur.
+              display:block şart: satır içi <img> taban çizgisi boşluğu ekliyor ve
+              kapak 297 mm'i aşıp ikinci sayfaya taşıyor. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/media/brand/inoxhan-logo.png"
+            alt="İnoxhan"
+            style={{ width: "72mm", display: "block" }}
+          />
           <h1
             className="font-display"
             style={{ fontSize: "42pt", fontWeight: 700, lineHeight: 1.05, marginTop: "18mm" }}
@@ -174,10 +181,10 @@ export default async function KatalogBaskiPage({
             >
               <div style={{ width: "42mm", flexShrink: 0 }}>
                 {p.images[0] ? (
-                  // Fotoğraflar siyah zeminli: koyu kutu içinde contain ile basılır
-                  // eslint-disable-next-line @next/next/no-img-element
+                  // Fotoğraflar siyah zeminli: koyu kutu içinde contain ile basılır.
                   // 42mm @300dpi ≈ 500px → -sm (480w) yeterli; -md kullanmak
                   // PDF'i gereksiz yere birkaç kat büyütüyor
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={`/${p.images[0].basePath}-sm.webp`}
                     alt={p.name}
@@ -191,6 +198,23 @@ export default async function KatalogBaskiPage({
                   />
                 ) : (
                   <div style={{ width: "42mm", height: "32mm", background: "#E8ECEF", borderRadius: "2mm" }} />
+                )}
+
+                {/* Teknik çizim — katalog PDF'inden çıkarılmış line-art, beyaz zeminli.
+                    Ölçü tablosu baskıya girmez: satır yüksekliğini ve dosya boyutunu
+                    katlıyor, web sayfasında tam çözünürlükte zaten var. */}
+                {p.drawings[0] && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={`/${p.drawings[0].basePath}-sm.webp`}
+                    alt={p.drawings[0].alt}
+                    style={{
+                      width: "42mm",
+                      height: "20mm",
+                      objectFit: "contain",
+                      marginTop: "2mm",
+                    }}
+                  />
                 )}
               </div>
 

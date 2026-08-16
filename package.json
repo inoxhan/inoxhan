@@ -14,7 +14,19 @@
     "import:urunler": "tsx scripts/import-urunler.ts",
     "temizle": "tsx scripts/temizle.ts",
     "import:excel": "tsx scripts/import-excel.ts",
-    "import:sample": "tsx scripts/make-sample-import.ts"
+    "import:sample": "tsx scripts/make-sample-import.ts",
+    "hazirla:logo": "tsx scripts/hazirla-logo.ts",
+    "hazirla:hero": "tsx scripts/hazirla-hero.ts",
+    "hazirla:medya": "tsx scripts/hazirla-medya.ts",
+    "hazirla:video": "tsx scripts/hazirla-video.ts",
+    "hazirla:yukleme": "tsx scripts/hazirla-yukleme.ts",
+    "hazirla:showreel": "tsx scripts/hazirla-showreel.ts",
+    "hazirla:katalog-video": "tsx scripts/hazirla-showreel.ts --katalog",
+    "hazirla:kategori": "tsx scripts/hazirla-kategori.ts",
+    "hazirla:og": "tsx scripts/hazirla-og.ts",
+    "katalog:render": "tsx scripts/katalog-render.ts",
+    "katalog:cizim": "tsx scripts/katalog-cizim-cikar.ts",
+    "import:cizim": "tsx scripts/import-katalog-cizim.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -51,6 +63,8 @@
     "@types/three": "^0.185.4",
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
+    "ffmpeg-static": "^5.3.0",
+    "pdfjs-dist": "^6.2.108",
     "playwright": "^1.62.1",
     "prisma": "^6.19.3",
     "tailwindcss": "^4",
