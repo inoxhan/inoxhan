@@ -1,0 +1,7 @@
+User-Agent: *
+Allow: /
+Disallow: /panel
+Disallow: /katalog-baski
+Disallow: /api/
+
+Sitemap: https://inoxhan.github.io/inoxhan/sitemap.xml

@@ -1,0 +1,9 @@
+:HL["/inoxhan/_next/static/chunks/43c4dqryylfid.css","style"]
+:HL["/inoxhan/_next/static/media/0c89a48fa5027cee-s.p.2cyn07wtgehh0.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/inoxhan/_next/static/media/1bffadaabf893a1e-s.p.3-6t-g6q0vh0a.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/inoxhan/_next/static/media/28868e710e86be81-s.p.2eksvhm1z0jwa.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/inoxhan/_next/static/media/3fe682a82f50d426-s.p.0vfdmo25voy_0.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/inoxhan/_next/static/media/70bc3e132a0a741e-s.p.3t6q91iet4nsy.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/inoxhan/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/inoxhan/media/brand/inoxhan-logo-sm.webp","image"]
+0:{"tree":{"name":"","param":null,"prefetchHints":4176,"slots":{"children":{"name":"urunler","param":null,"prefetchHints":4192,"slots":{"children":{"name":"kategori","param":{"type":"d","key":"vidalar","siblings":[]},"prefetchHints":4192,"slots":{"children":{"name":"slug","param":{"type":"d","key":"inox-mercimek-basli-metrik-vida-din-964","siblings":[]},"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}}}}}},"staleTime":300,"buildId":"MO4YG1jSuRq8m0vvHPN1B"}
