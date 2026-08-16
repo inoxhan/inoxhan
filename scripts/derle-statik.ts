@@ -147,52 +147,9 @@ async function main() {
 
     // 5) GitHub Pages: _next/ dizini Jekyll tarafından yutulmasın
     writeFileSync(path.join(KOK, "out", ".nojekyll"), "", "utf8");
-
-    // 6) Dağıtım iş akışı gh-pages dalında yaşar — her derlemede out/'a yazılır ki
-    //    dal tamamen out/ içeriğiyle değiştirildiğinde iş akışı kaybolmasın
-    const isAkisi = path.join(KOK, "out", ".github", "workflows");
-    mkdirSync(isAkisi, { recursive: true });
-    writeFileSync(
-      path.join(isAkisi, "pages.yml"),
-      `# gh-pages dalindaki hazir statik ciktiyi GitHub Pages'e dagitir.
-# Ilk calismada Pages kaynagini "GitHub Actions" moduna cevirir —
-# boylece main'deki README degil, bu daldaki site yayinlanir.
-name: GitHub Pages yayini
-
-on:
-  push:
-    branches: [gh-pages]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: \${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-        with:
-          enablement: true
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-      - id: deployment
-        uses: actions/deploy-pages@v4
-`,
-      "utf8",
-    );
     console.log("✓ out/ hazır — gh-pages dalına itilebilir");
+    console.log("  Dağıtım: .github/workflows/pages.yml (main) gh-pages içeriğini yayınlar;");
+    console.log("  gh-pages push sonrası main'e push ya da Actions'tan 'Run workflow' gerekir.");
   } finally {
     for (const y of yamalananlar) writeFileSync(y.dosya, y.orijinal, "utf8");
     for (const t of tasinanlar.reverse()) renameSync(t.hedef, t.kaynak);

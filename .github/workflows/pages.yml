@@ -1,0 +1,43 @@
+# gh-pages dalindaki hazir statik ciktiyi (npm run derle:statik -> out/) GitHub Pages'e dagitir.
+#
+# github-pages ortaminin koruma kurali yalnizca main dalindan dagitima izin verdigi
+# icin is akisi main'de yasar, icerigi gh-pages dalindan checkout eder.
+# Ilk basarili calisma Pages kaynagini "GitHub Actions" moduna cevirir — boylece
+# main'deki README degil, gh-pages'teki site yayinlanir.
+#
+# Yeni dagitim: gh-pages dalini guncelledikten sonra main'e herhangi bir push
+# ya da Actions sekmesinden elle "Run workflow".
+name: GitHub Pages yayini
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4
