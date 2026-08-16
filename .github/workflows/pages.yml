@@ -39,5 +39,11 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .
+      # Pages kaynagi ayarlarda hala "Deploy from a branch" oldugu surece ayni push,
+      # README'yi yayinlayan eski tip "pages build and deployment" isini de tetikler
+      # ve o is ~1 dk icinde bitip bizim dagitimimizin ustune yazar. Bekleyip son
+      # dagitimin bu is akisindan cikmasini garantiliyoruz. Ayarlar > Pages >
+      # Source: "GitHub Actions" secilirse eski is devre disi kalir; bekleme zararsizlasir.
+      - run: sleep 150
       - id: deployment
         uses: actions/deploy-pages@v4
