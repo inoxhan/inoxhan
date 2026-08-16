@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Zap } from "lucide-react";
 import { buttonStyles } from "@/components/ui/Button";
+import { IS_STATIC } from "@/lib/asset";
 import {
   QUALITY_HINTS,
   QUALITY_LABELS,
@@ -19,7 +20,10 @@ import { cn } from "@/lib/utils";
 export function QualityPicker({ sku }: { sku: string }) {
   const [quality, setQuality] = useState<Quality>("A2");
 
-  const href = `/teklif?urun=${encodeURIComponent(sku)}&kalite=${quality}&kaynak=product`;
+  // Sunucu modunda hızlı seçici o DIN ile filtreli açılır; statikte eski tek form
+  const href = IS_STATIC
+    ? `/teklif?urun=${encodeURIComponent(sku)}&kalite=${quality}&kaynak=product`
+    : `/teklif/liste?din=${encodeURIComponent(sku)}`;
 
   return (
     <div>

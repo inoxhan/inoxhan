@@ -22,7 +22,17 @@ export default async function PanelKatalogPage() {
       </p>
 
       <div className="rounded-lg border border-steel-200 bg-white p-6 shadow-card">
-        <CatalogGenerator running={running} />
+        {process.env.VERCEL ? (
+          // Playwright (Chromium) serverless'ta çalışmaz — üretim lokalde yapılır
+          <p className="rounded-md border border-steel-200 bg-steel-50 p-4 text-sm text-steel-600">
+            PDF üretimi bu sunucuda çalışmaz. Lokal ortamda{" "}
+            <code className="font-mono text-steel-900">npm run katalog:render</code>{" "}
+            ile üretip dosyayı <code className="font-mono text-steel-900">public/katalog.pdf</code>{" "}
+            olarak commit edin — site /katalog sayfası onu sunar.
+          </p>
+        ) : (
+          <CatalogGenerator running={running} />
+        )}
 
         {status.state === "error" && (
           <p className="mt-4 flex items-start gap-2 rounded-md border border-status-overdue/30 bg-status-overdue/5 p-3 text-sm text-status-overdue">

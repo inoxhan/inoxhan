@@ -119,10 +119,11 @@ export const EVENT_TYPES = [
   "form_abandon",
   "whatsapp_click",
   "product_quote_requested",
+  "quote_list_submitted",
   "category_view",
   "search_query",
 ] as const;
 export type EventType = (typeof EVENT_TYPES)[number];
 
-/** Teklif kaynakları — hangi noktadan forma gelindi. */
-export const QUOTE_SOURCES = ["form", "product", "hero", "floating"] as const;
+/** Teklif kaynakları — hangi noktadan forma gelindi. liste/dosya: iki kanallı sistem. */
+export const QUOTE_SOURCES = ["form", "product", "hero", "floating", "liste", "dosya"] as const;

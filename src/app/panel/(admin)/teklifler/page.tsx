@@ -28,7 +28,11 @@ export default async function TekliflerPage({
     ),
     db.quoteRequest.findMany({
       where: { status: durum },
-      include: { customer: true, items: { include: { product: true } } },
+      include: {
+        customer: true,
+        items: { include: { product: true, variant: true }, orderBy: { order: "asc" } },
+        _count: { select: { attachments: true } },
+      },
       // Açık taleplerde en eski (SLA'ya en yakın) üstte; cevaplananlar yeniden eskiye
       orderBy: open ? { createdAt: "asc" } : { respondedAt: "desc" },
       take: 100,
@@ -74,8 +78,13 @@ export default async function TekliflerPage({
                   <div className="min-w-0">
                     <p className="flex items-center gap-2 font-medium text-steel-900">
                       {q.customer.name}
-                      {q.attachmentPath && (
+                      {(q.attachmentPath || q._count.attachments > 0) && (
                         <Paperclip className="size-3.5 text-steel-400" aria-label="Ekli dosya" />
+                      )}
+                      {(q.source === "liste" || q.source === "dosya") && (
+                        <span className="rounded-full border border-steel-200 bg-steel-50 px-2 py-px text-[11px] font-normal text-steel-500">
+                          {q.source}
+                        </span>
                       )}
                     </p>
                     <p className="text-sm text-steel-500">
@@ -84,7 +93,10 @@ export default async function TekliflerPage({
                   </div>
                   <div className="min-w-0">
                     <p className="truncate text-sm text-steel-700">
-                      {item?.product?.name ?? item?.freeText ?? "—"}
+                      {item?.variant?.description ??
+                        item?.product?.name ??
+                        item?.freeText ??
+                        "—"}
                     </p>
                     <p className="text-xs text-steel-400">
                       {item ? `${item.quantity} ${item.unit}` : ""}

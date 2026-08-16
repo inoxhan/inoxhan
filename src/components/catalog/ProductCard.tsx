@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Zap } from "lucide-react";
 import { ProductImage } from "@/components/catalog/ProductImage";
+import { IS_STATIC } from "@/lib/asset";
 
 /** Karta gereken sade veri — hem RSC (Prisma) hem istemci (arama indeksi) besleyebilir. */
 export interface ProductCardData {
@@ -64,7 +65,11 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             Detayları Gör
           </Link>
           <Link
-            href={`/teklif?urun=${encodeURIComponent(product.sku)}&kaynak=product`}
+            href={
+              IS_STATIC
+                ? `/teklif?urun=${encodeURIComponent(product.sku)}&kaynak=product`
+                : `/teklif/liste?din=${encodeURIComponent(product.sku)}`
+            }
             data-track="quote_button_click"
             data-track-payload={JSON.stringify({ where: "card", sku: product.sku })}
             className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-md bg-steel-950 text-sm font-medium text-steel-50 transition-colors hover:bg-steel-800"

@@ -47,9 +47,9 @@ prisma/dev.db*
 prisma/*.db*
 
 # Statik derleme (scripts/derle-statik.ts) ara urunleri
+# (public/katalog.pdf artik depoda KALICI — Vercel'de PDF uretimi yok, commit edilir)
 .statik-cikarilan/
 public/search-index.json
-public/katalog.pdf
 
 # Kaynak urun fotograflari (~70 MB). Islenmis AVIF/WebP turevleri
 # public/media/products altinda ve depoya dahildir.

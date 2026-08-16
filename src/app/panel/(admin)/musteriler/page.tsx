@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { formatPhoneTr } from "@/lib/phone";
 import { db } from "@/server/db";
 
@@ -21,6 +22,7 @@ export default async function PanelMusterilerPage() {
               <th className="p-3">Müşteri</th>
               <th className="p-3">Telefon</th>
               <th className="p-3">E-posta</th>
+              <th className="p-3">Adres</th>
               <th className="p-3">Talep</th>
               <th className="p-3">Son Talep</th>
             </tr>
@@ -29,8 +31,12 @@ export default async function PanelMusterilerPage() {
             {customers.map((c) => (
               <tr key={c.id} className="border-b border-steel-50 last:border-0 hover:bg-steel-50">
                 <td className="p-3">
-                  <p className="font-medium text-steel-900">{c.name}</p>
-                  {c.company && <p className="text-xs text-steel-400">{c.company}</p>}
+                  <Link href={`/panel/musteriler/${c.id}`} className="block">
+                    <p className="font-medium text-steel-900 underline-offset-4 hover:underline">
+                      {c.name}
+                    </p>
+                    {c.company && <p className="text-xs text-steel-400">{c.company}</p>}
+                  </Link>
                 </td>
                 <td className="p-3 text-steel-600">
                   <a href={`tel:${c.phone}`} className="hover:underline">
@@ -38,6 +44,7 @@ export default async function PanelMusterilerPage() {
                   </a>
                 </td>
                 <td className="p-3 text-steel-600">{c.email ?? "—"}</td>
+                <td className="max-w-52 truncate p-3 text-steel-500">{c.address ?? "—"}</td>
                 <td className="p-3 text-steel-600">{c._count.quotes}</td>
                 <td className="p-3 text-steel-500">
                   {c.quotes[0]?.createdAt.toLocaleDateString("tr-TR") ?? "—"}
@@ -46,7 +53,7 @@ export default async function PanelMusterilerPage() {
             ))}
             {customers.length === 0 && (
               <tr>
-                <td colSpan={5} className="p-8 text-center text-steel-400">
+                <td colSpan={6} className="p-8 text-center text-steel-400">
                   Henüz müşteri kaydı yok.
                 </td>
               </tr>

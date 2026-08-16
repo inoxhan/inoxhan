@@ -9,6 +9,11 @@ import type { NextConfig } from "next";
 const statik = process.env.STATIC_EXPORT === "1";
 
 const nextConfig: NextConfig = {
+  // Dosyalı teklif kanalının dev/disk fallback'i FormData ile gelir (10 MB dosya
+  // + multipart ek yükü). Vercel'de dosyalar istemciden doğrudan Blob'a yüklenir.
+  experimental: {
+    serverActions: { bodySizeLimit: "12mb" },
+  },
   ...(statik && {
     output: "export" as const,
     basePath: process.env.NEXT_PUBLIC_BASE_PATH ?? "",

@@ -19,7 +19,11 @@ export const quoteSchema = z.object({
     .refine((v) => normalizePhoneTr(v) !== null, {
       message: "Geçerli bir telefon numarası girin (örn. 0 5xx xxx xx xx)",
     }),
-  email: z.email("Geçerli bir e-posta adresi girin").max(160),
+  email: z
+    .email("Geçerli bir e-posta adresi girin")
+    .max(160)
+    .optional()
+    .or(z.literal("")),
   // Katalogdan gelindiyse SKU dolu olur; serbest metin ihtiyaç da yazılabilir.
   productSku: z.string().trim().max(60).optional().or(z.literal("")),
   productText: z.string().trim().max(300, "Ürün açıklaması çok uzun").optional().or(z.literal("")),

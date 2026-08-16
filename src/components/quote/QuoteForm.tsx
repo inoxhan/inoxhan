@@ -177,7 +177,7 @@ export function QuoteForm({
     fd.set("name", values.name);
     fd.set("company", values.company ?? "");
     fd.set("phone", values.phone);
-    fd.set("email", values.email);
+    fd.set("email", values.email ?? "");
     fd.set("productSku", productLocked ? (values.productSku ?? "") : "");
     fd.set("productText", values.productText ?? "");
     fd.set("quantity", String(values.quantity));
@@ -299,7 +299,7 @@ export function QuoteForm({
             {...register("phone")}
           />
         </Field>
-        <Field label="E-posta" required error={errors.email?.message}>
+        <Field label="E-posta" error={errors.email?.message}>
           <input
             type="email"
             inputMode="email"

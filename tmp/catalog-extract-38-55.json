@@ -1,0 +1,262 @@
+[
+  {
+    "page": 38,
+    "productNameTurkish": "INOX ALTIKÖŞE FLANŞLI SOMUN",
+    "normLabel": "DIN 6923",
+    "grades": ["A2", "A4"],
+    "variantMode": "single",
+    "variants": ["M5", "M6", "M8", "M10", "M12", "M14", "M16", "M20"],
+    "notes": ""
+  },
+  {
+    "page": 39,
+    "productNameTurkish": "INOX BOMBE BAŞLI İMBUS CIVATA",
+    "normLabel": "DIN 7380",
+    "grades": ["A2", "A4"],
+    "variantMode": "matrix",
+    "variants": [
+      "M3x6", "M3x8", "M3x10", "M3x12", "M3x14", "M3x16", "M3x18", "M3x20",
+      "M4x6", "M4x8", "M4x10", "M4x12", "M4x14", "M4x16", "M4x18", "M4x20", "M4x25", "M4x30", "M4x35",
+      "M5x6", "M5x8", "M5x10", "M5x12", "M5x14", "M5x16", "M5x18", "M5x20", "M5x25", "M5x30", "M5x35", "M5x40",
+      "M6x8", "M6x10", "M6x12", "M6x14", "M6x16", "M6x18", "M6x20", "M6x25", "M6x30", "M6x35", "M6x40", "M6x45", "M6x50", "M6x55", "M6x60",
+      "M8x10", "M8x12", "M8x14", "M8x16", "M8x18", "M8x20", "M8x25", "M8x30", "M8x35", "M8x40", "M8x45", "M8x50", "M8x55", "M8x60",
+      "M10x16", "M10x18", "M10x20", "M10x25", "M10x30", "M10x35", "M10x40", "M10x45", "M10x50", "M10x60",
+      "M12x25", "M12x30", "M12x35", "M12x40", "M12x45", "M12x50", "M12x60"
+    ],
+    "notes": ""
+  },
+  {
+    "page": 40,
+    "productNameTurkish": "INOX YILDIZ SİLİNDİR BAŞLI SAÇ VİDASI",
+    "normLabel": "DIN 7981",
+    "grades": ["A2", "A4"],
+    "variantMode": "matrix",
+    "variants": [
+      "2,2x4,5", "2,2x6,5", "2,2x9,5", "2,2x13",
+      "2,9x4,5", "2,9x6,5", "2,9x9,5", "2,9x13", "2,9x16", "2,9x19", "2,9x22", "2,9x25", "2,9x32",
+      "3,5x4,5", "3,5x6,5", "3,5x9,5", "3,5x13", "3,5x16", "3,5x19", "3,5x22", "3,5x25", "3,5x32", "3,5x38", "3,5x45",
+      "3,9x4,5", "3,9x6,5", "3,9x9,5", "3,9x13", "3,9x16", "3,9x19", "3,9x22", "3,9x25", "3,9x32", "3,9x38", "3,9x45",
+      "4,2x4,5", "4,2x6,5", "4,2x9,5", "4,2x13", "4,2x16", "4,2x19", "4,2x22", "4,2x25", "4,2x32", "4,2x38", "4,2x45",
+      "4,8x6,5", "4,8x9,5", "4,8x13", "4,8x16", "4,8x19", "4,8x22", "4,8x25", "4,8x32", "4,8x38", "4,8x45", "4,8x50", "4,8x70", "4,8x80",
+      "5,5x9,5", "5,5x13", "5,5x16", "5,5x19", "5,5x22", "5,5x25", "5,5x32", "5,5x38", "5,5x45", "5,5x50", "5,5x70", "5,5x80",
+      "6,3x9,5", "6,3x13", "6,3x16", "6,3x19", "6,3x22", "6,3x25", "6,3x32", "6,3x38", "6,3x45", "6,3x50", "6,3x70", "6,3x80"
+    ],
+    "notes": "Çap başlıkları katalogda M öneki olmadan gösterilmiştir; varyantlar aynı biçimde korunmuştur."
+  },
+  {
+    "page": 41,
+    "productNameTurkish": "INOX YILDIZ HAVŞA BAŞLI SAÇ VİDASI",
+    "normLabel": "DIN 7982",
+    "grades": ["A2", "A4"],
+    "variantMode": "matrix",
+    "variants": [
+      "2,2x6,5", "2,2x9,5", "2,2x13", "2,2x16",
+      "2,9x6,5", "2,9x9,5", "2,9x13", "2,9x16", "2,9x19", "2,9x22", "2,9x25", "2,9x32", "2,9x38",
+      "3,5x6,5", "3,5x9,5", "3,5x13", "3,5x16", "3,5x19", "3,5x22", "3,5x25", "3,5x32", "3,5x38", "3,5x45", "3,5x50",
+      "3,9x6,5", "3,9x9,5", "3,9x13", "3,9x16", "3,9x19", "3,9x22", "3,9x25", "3,9x32", "3,9x38", "3,9x45", "3,9x50",
+      "4,2x6,5", "4,2x9,5", "4,2x13", "4,2x16", "4,2x19", "4,2x22", "4,2x25", "4,2x32", "4,2x38", "4,2x45", "4,2x50",
+      "4,8x9,5", "4,8x13", "4,8x16", "4,8x19", "4,8x22", "4,8x25", "4,8x32", "4,8x38", "4,8x45", "4,8x50",
+      "5,5x13", "5,5x16", "5,5x19", "5,5x22", "5,5x25", "5,5x32", "5,5x38", "5,5x45", "5,5x50",
+      "6,3x13", "6,3x16", "6,3x19", "6,3x22", "6,3x25", "6,3x32", "6,3x38", "6,3x45", "6,3x50"
+    ],
+    "notes": "Çap başlıkları katalogda M öneki olmadan gösterilmiştir; varyantlar aynı biçimde korunmuştur."
+  },
+  {
+    "page": 42,
+    "productNameTurkish": "INOX YILDIZ MERCİMEK BAŞLI SAÇ VİDASI",
+    "normLabel": "DIN 7983",
+    "grades": ["A2", "A4"],
+    "variantMode": "matrix",
+    "variants": [
+      "2,2x6,5", "2,2x9,5", "2,2x13", "2,2x16",
+      "2,9x6,5", "2,9x9,5", "2,9x13", "2,9x16", "2,9x19", "2,9x22", "2,9x25", "2,9x32", "2,9x38",
+      "3,5x6,5", "3,5x9,5", "3,5x13", "3,5x16", "3,5x19", "3,5x22", "3,5x25", "3,5x32", "3,5x38", "3,5x45", "3,5x50",
+      "3,9x6,5", "3,9x9,5", "3,9x13", "3,9x16", "3,9x19", "3,9x22", "3,9x25", "3,9x32", "3,9x38", "3,9x45", "3,9x50",
+      "4,2x9,5", "4,2x13", "4,2x16", "4,2x19", "4,2x22", "4,2x25", "4,2x32", "4,2x38", "4,2x45", "4,2x50",
+      "4,8x9,5", "4,8x13", "4,8x16", "4,8x19", "4,8x22", "4,8x25", "4,8x32", "4,8x38", "4,8x45", "4,8x50", "4,8x60", "4,8x70", "4,8x80",
+      "5,5x13", "5,5x16", "5,5x19", "5,5x22", "5,5x25", "5,5x32", "5,5x38", "5,5x45", "5,5x50", "5,5x60", "5,5x70", "5,5x80",
+      "6,3x13", "6,3x16", "6,3x19", "6,3x22", "6,3x25", "6,3x32", "6,3x38", "6,3x45", "6,3x50", "6,3x60", "6,3x70", "6,3x80"
+    ],
+    "notes": "Çap başlıkları katalogda M öneki olmadan gösterilmiştir; varyantlar aynı biçimde korunmuştur."
+  },
+  {
+    "page": 43,
+    "productNameTurkish": "INOX YILDIZ SİLİNDİR BAŞLI METRİK VİDA",
+    "normLabel": "DIN 7985",
+    "grades": ["A2", "A4"],
+    "variantMode": "matrix",
+    "variants": [
+      "M2x4", "M2x5", "M2x6", "M2x8", "M2x10", "M2x12", "M2x14", "M2x16", "M2x20",
+      "M2,5x4", "M2,5x5", "M2,5x6", "M2,5x8", "M2,5x10", "M2,5x12", "M2,5x14", "M2,5x16", "M2,5x20", "M2,5x25",
+      "M3x4", "M3x5", "M3x6", "M3x7", "M3x8", "M3x10", "M3x12", "M3x14", "M3x16", "M3x18", "M3x20", "M3x22", "M3x25", "M3x30", "M3x35", "M3x40", "M3x45", "M3x50",
+      "M4x5", "M4x6", "M4x7", "M4x8", "M4x10", "M4x12", "M4x14", "M4x16", "M4x18", "M4x20", "M4x22", "M4x25", "M4x30", "M4x35", "M4x40", "M4x45", "M4x50", "M4x55", "M4x60",
+      "M5x6", "M5x7", "M5x8", "M5x10", "M5x12", "M5x14", "M5x16", "M5x18", "M5x20", "M5x22", "M5x25", "M5x30", "M5x35", "M5x40", "M5x45", "M5x50", "M5x55", "M5x60", "M5x70",
+      "M6x8", "M6x10", "M6x12", "M6x14", "M6x16", "M6x18", "M6x20", "M6x22", "M6x25", "M6x30", "M6x35", "M6x40", "M6x45", "M6x50", "M6x55", "M6x60", "M6x70", "M6x80",
+      "M8x10", "M8x12", "M8x16", "M8x20", "M8x25", "M8x30", "M8x35", "M8x40", "M8x45", "M8x50", "M8x55", "M8x60", "M8x70", "M8x80", "M8x90", "M8x100"
+    ],
+    "notes": ""
+  },
+  {
+    "page": 44,
+    "productNameTurkish": "INOX HAVŞA BAŞLI İMBUS CIVATA",
+    "normLabel": "DIN 7991",
+    "grades": ["A2", "A4"],
+    "variantMode": "matrix",
+    "variants": [
+      "M3x6", "M3x8", "M3x10", "M3x12", "M3x14", "M3x16", "M3x18", "M3x20", "M3x22", "M3x25", "M3x30",
+      "M4x6", "M4x8", "M4x10", "M4x12", "M4x14", "M4x16", "M4x18", "M4x20", "M4x22", "M4x25", "M4x30", "M4x35", "M4x40", "M4x45", "M4x50", "M4x60",
+      "M5x6", "M5x8", "M5x10", "M5x12", "M5x14", "M5x16", "M5x18", "M5x20", "M5x22", "M5x25", "M5x30", "M5x35", "M5x40", "M5x45", "M5x50", "M5x55", "M5x60", "M5x65", "M5x70", "M5x80",
+      "M6x8", "M6x10", "M6x12", "M6x14", "M6x16", "M6x18", "M6x20", "M6x22", "M6x25", "M6x30", "M6x35", "M6x40", "M6x45", "M6x50", "M6x55", "M6x60", "M6x65", "M6x70", "M6x80", "M6x90", "M6x100",
+      "M8x10", "M8x12", "M8x14", "M8x16", "M8x18", "M8x20", "M8x25", "M8x30", "M8x35", "M8x40", "M8x45", "M8x50", "M8x55", "M8x60", "M8x70", "M8x80", "M8x90", "M8x100", "M8x110", "M8x120",
+      "M10x12", "M10x14", "M10x16", "M10x18", "M10x20", "M10x25", "M10x30", "M10x35", "M10x40", "M10x45", "M10x50", "M10x55", "M10x60", "M10x70", "M10x80", "M10x90", "M10x100", "M10x110", "M10x120",
+      "M12x20", "M12x25", "M12x30", "M12x35", "M12x40", "M12x45", "M12x50", "M12x55", "M12x60", "M12x70", "M12x80", "M12x90", "M12x100", "M12x110", "M12x120",
+      "M14x25", "M14x30", "M14x35", "M14x40", "M14x45", "M14x50", "M14x55", "M14x60", "M14x70", "M14x80", "M14x90", "M14x100",
+      "M16x30", "M16x35", "M16x40", "M16x45", "M16x50", "M16x55", "M16x60", "M16x70", "M16x80", "M16x90", "M16x100",
+      "M20x35", "M20x40", "M20x45", "M20x50", "M20x55", "M20x60", "M20x70", "M20x80", "M20x90", "M20x100"
+    ],
+    "notes": "M18 sütununda dolu ağırlık hücresi bulunmadığından M18 varyantı eklenmemiştir."
+  },
+  {
+    "page": 45,
+    "productNameTurkish": "INOX GENİŞ PUL",
+    "normLabel": "DIN 9021",
+    "grades": ["A2", "A4"],
+    "variantMode": "single",
+    "variants": ["M3", "M4", "M5", "M6", "M8", "M10", "M12", "M14", "M16", "M18", "M20", "M24", "M30", "M36"],
+    "notes": "Tabloda bazı metrikler farklı d1/d2/s geometrileri ve ISO 7093/7094 karşılıkları için yinelenmiştir; metrik-only pul çıktısı istendiği için tekrarlar tekilleştirilmiştir."
+  },
+  {
+    "page": 46,
+    "productNameTurkish": "INOX DÜZ KAMA",
+    "normLabel": "DIN 6885A",
+    "grades": ["A2", "A4"],
+    "variantMode": "special",
+    "variants": [
+      "4x4x8", "4x4x10", "4x4x12", "4x4x14", "4x4x15", "4x4x16", "4x4x18", "4x4x20", "4x4x22", "4x4x25", "4x4x28", "4x4x30", "4x4x32", "4x4x35", "4x4x36", "4x4x40", "4x4x45", "4x4x50",
+      "5x5x12", "5x5x14", "5x5x15", "5x5x16", "5x5x18", "5x5x20", "5x5x22", "5x5x25", "5x5x28", "5x5x30", "5x5x32", "5x5x35", "5x5x36", "5x5x40", "5x5x45", "5x5x50", "5x5x55", "5x5x56", "5x5x60", "5x5x65",
+      "6x6x12", "6x6x14", "6x6x15", "6x6x16", "6x6x18", "6x6x20", "6x6x22", "6x6x25", "6x6x28", "6x6x30", "6x6x32", "6x6x35", "6x6x36", "6x6x40", "6x6x45", "6x6x50", "6x6x55", "6x6x56", "6x6x60", "6x6x65", "6x6x70", "6x6x75", "6x6x80",
+      "8x7x15", "8x7x16", "8x7x18", "8x7x20", "8x7x22", "8x7x25", "8x7x28", "8x7x30", "8x7x32", "8x7x35", "8x7x36", "8x7x40", "8x7x45", "8x7x50", "8x7x55", "8x7x56", "8x7x60", "8x7x65", "8x7x70", "8x7x75", "8x7x80", "8x7x90", "8x7x100",
+      "10x8x20", "10x8x25", "10x8x30", "10x8x35", "10x8x40", "10x8x45", "10x8x50", "10x8x55", "10x8x56", "10x8x60", "10x8x70", "10x8x75", "10x8x80", "10x8x90", "10x8x100",
+      "12x8x20", "12x8x25", "12x8x30", "12x8x35", "12x8x40", "12x8x45", "12x8x50", "12x8x55", "12x8x56", "12x8x60", "12x8x65", "12x8x70", "12x8x75", "12x8x80", "12x8x90", "12x8x100"
+    ],
+    "notes": "Özel eksen sırası katalogdaki b x h x l biçimidir."
+  },
+  {
+    "page": 47,
+    "productNameTurkish": "INOX ALTIKÖŞE PUL BAŞLI MATKAP UÇLU VİDA",
+    "normLabel": "DIN 7504K",
+    "grades": ["A2", "A4"],
+    "variantMode": "matrix",
+    "variants": [
+      "3,5x9,5", "3,5x13", "3,5x16", "3,5x19",
+      "3,9x13", "3,9x16", "3,9x19", "3,9x22", "3,9x25", "3,9x32",
+      "4,2x13", "4,2x16", "4,2x19", "4,2x22", "4,2x25", "4,2x32", "4,2x38",
+      "4,8x13", "4,8x16", "4,8x19", "4,8x22", "4,8x25", "4,8x32", "4,8x38", "4,8x45", "4,8x50",
+      "5,5x16", "5,5x19", "5,5x22", "5,5x25", "5,5x32", "5,5x38", "5,5x45", "5,5x50", "5,5x60",
+      "6,3x16", "6,3x19", "6,3x22", "6,3x25", "6,3x32", "6,3x38", "6,3x45", "6,3x50", "6,3x60", "6,3x70", "6,3x80", "6,3x90", "6,3x100", "6,3x110", "6,3x120", "6,3x130", "6,3x140", "6,3x150", "6,3x160", "6,3x170", "6,3x180", "6,3x190", "6,3x200"
+    ],
+    "notes": "Çap başlıkları katalogda M öneki olmadan gösterilmiştir; varyantlar aynı biçimde korunmuştur."
+  },
+  {
+    "page": 48,
+    "productNameTurkish": "INOX YILDIZ SİLİNDİR BAŞLI MATKAP UÇLU VİDA",
+    "normLabel": "DIN 7504N",
+    "grades": ["A2", "A4"],
+    "variantMode": "matrix",
+    "variants": [
+      "2,9x9,5", "2,9x13", "2,9x16", "2,9x19",
+      "3,5x9,5", "3,5x13", "3,5x16", "3,5x19", "3,5x22", "3,5x25",
+      "3,9x13", "3,9x16", "3,9x19", "3,9x22", "3,9x25",
+      "4,2x13", "4,2x16", "4,2x19", "4,2x22", "4,2x25",
+      "4,8x13", "4,8x16", "4,8x19", "4,8x22", "4,8x25", "4,8x32", "4,8x38", "4,8x45", "4,8x50", "4,8x60",
+      "5,5x19", "5,5x22", "5,5x25", "5,5x32", "5,5x38", "5,5x45", "5,5x50",
+      "6,3x19", "6,3x22", "6,3x25", "6,3x32", "6,3x38", "6,3x45", "6,3x50", "6,3x60", "6,3x70", "6,3x80", "6,3x90", "6,3x100"
+    ],
+    "notes": "Çap başlıkları katalogda M öneki olmadan gösterilmiştir; varyantlar aynı biçimde korunmuştur."
+  },
+  {
+    "page": 49,
+    "productNameTurkish": "INOX YILDIZ HAVŞA BAŞLI MATKAP UÇLU VİDA",
+    "normLabel": "DIN 7504P",
+    "grades": ["A2", "A4"],
+    "variantMode": "matrix",
+    "variants": [
+      "2,9x13", "2,9x16", "2,9x19", "2,9x22", "2,9x25",
+      "3,5x13", "3,5x16", "3,5x19", "3,5x22", "3,5x25", "3,5x32", "3,5x38",
+      "3,9x13", "3,9x16", "3,9x19", "3,9x22", "3,9x25", "3,9x32", "3,9x38",
+      "4,2x13", "4,2x16", "4,2x19", "4,2x22", "4,2x25", "4,2x32", "4,2x38", "4,2x45",
+      "4,8x13", "4,8x16", "4,8x19", "4,8x22", "4,8x25", "4,8x32", "4,8x38", "4,8x45", "4,8x50", "4,8x60", "4,8x70", "4,8x80",
+      "5,5x16", "5,5x19", "5,5x22", "5,5x25", "5,5x32", "5,5x38", "5,5x45", "5,5x50",
+      "6,3x19", "6,3x22", "6,3x25", "6,3x32", "6,3x38", "6,3x45", "6,3x50", "6,3x60", "6,3x70", "6,3x80", "6,3x90", "6,3x100"
+    ],
+    "notes": "Çap başlıkları katalogda M öneki olmadan gösterilmiştir; varyantlar aynı biçimde korunmuştur."
+  },
+  {
+    "page": 50,
+    "productNameTurkish": "INOX SUNTA VİDASI",
+    "normLabel": "DIN 7505 A",
+    "grades": ["A2", "A4"],
+    "variantMode": "matrix",
+    "variants": [
+      "3x10", "3x12", "3x16", "3x18", "3x20", "3x25", "3x30", "3x35", "3x40", "3x45", "3x50",
+      "3,5x12", "3,5x16", "3,5x18", "3,5x20", "3,5x25", "3,5x30", "3,5x35", "3,5x40",
+      "4x16", "4x18", "4x20", "4x25", "4x30", "4x35", "4x40", "4x45", "4x50", "4x55", "4x60",
+      "4,5x20", "4,5x25", "4,5x30", "4,5x35", "4,5x40", "4,5x45", "4,5x50", "4,5x55", "4,5x60",
+      "5x20", "5x25", "5x30", "5x35", "5x40", "5x45", "5x50", "5x60", "5x70", "5x80", "5x90", "5x100",
+      "6x20", "6x25", "6x30", "6x35", "6x40", "6x45", "6x50", "6x55", "6x60", "6x70", "6x80", "6x90", "6x100", "6x110", "6x120", "6x150"
+    ],
+    "notes": "Çap başlıkları katalogda M öneki olmadan gösterilmiştir; varyantlar aynı biçimde korunmuştur."
+  },
+  {
+    "page": 51,
+    "productNameTurkish": "INOX POZİ BOMBE BAŞLI SUNTA VİDASI",
+    "normLabel": "DIN 7505 B",
+    "grades": ["A2", "A4"],
+    "variantMode": "matrix",
+    "variants": [
+      "3x12", "3x16", "3x18", "3x20", "3x25", "3x30",
+      "3,5x12", "3,5x16", "3,5x18", "3,5x20", "3,5x25", "3,5x30", "3,5x35", "3,5x40",
+      "4x16", "4x18", "4x20", "4x25", "4x30", "4x35", "4x40", "4x45", "4x50", "4x55", "4x60",
+      "4,5x20", "4,5x25", "4,5x30", "4,5x35", "4,5x40", "4,5x45", "4,5x50", "4,5x55", "4,5x60",
+      "5x20", "5x25", "5x30", "5x35", "5x40", "5x45", "5x50", "5x55", "5x60", "5x70", "5x80", "5x90",
+      "6x20", "6x25", "6x30", "6x35", "6x40", "6x45", "6x50", "6x55", "6x60", "6x70", "6x80", "6x90"
+    ],
+    "notes": "Katalogdaki 70*, 80* ve 90* uzunluklarının yıldız dipnot işaretleri nihai ölçü etiketinden çıkarılmıştır; çaplar katalogda M öneksizdir."
+  },
+  {
+    "page": 52,
+    "productNameTurkish": "INOX ÇAKMA DÜBEL",
+    "normLabel": "",
+    "grades": [],
+    "variantMode": "special",
+    "variants": ["M6x25", "M8x30", "M10x40", "M12x50", "M14x55", "M16x65", "M20x80"],
+    "notes": "Sayfada DIN/ISO/UNI normu veya kalite sınıfı gösterilmemiştir; varyant d1 diş çapı ile l dübel uzunluğunu birleştirir."
+  },
+  {
+    "page": 53,
+    "productNameTurkish": "INOX ÇEKME DÜBEL",
+    "normLabel": "",
+    "grades": [],
+    "variantMode": "special",
+    "variants": ["M6x65", "M8x75", "M10x85", "M10x110", "M12x90", "M14x110", "M16x120"],
+    "notes": "Sayfada DIN/ISO/UNI normu veya kalite sınıfı gösterilmemiştir; varyant d1 diş çapı ile l dübel uzunluğunu birleştirir."
+  },
+  {
+    "page": 54,
+    "productNameTurkish": "INOX KLİPSLİ DÜBEL",
+    "normLabel": "",
+    "grades": [],
+    "variantMode": "special",
+    "variants": ["M6x65", "M6x75", "M8x75", "M8x115", "M10x90", "M10x110", "M12x110", "M12x125", "M12x160", "M12x180", "M12x200", "M16x145", "M16x200", "M16x225", "M20x150", "M20x200", "M24x160", "M24x200"],
+    "notes": "Sayfada DIN/ISO/UNI normu veya kalite sınıfı gösterilmemiştir; varyant d1 diş çapı ile l dübel uzunluğunu birleştirir."
+  },
+  {
+    "page": 55,
+    "productNameTurkish": "INOX ZİNCİR",
+    "normLabel": "DIN 5685",
+    "grades": ["A2", "A4"],
+    "variantMode": "special",
+    "variants": ["2x12", "2x22", "2,5x14", "2,5x24", "3x16", "3x26", "3,5x18", "3,5x28", "4x19", "4x32", "4,5x20", "4,5x34", "5x21", "5x35", "6x24", "6x42", "7x28", "7x49", "8x32", "8x52", "10x40", "10x65", "12x48", "12x78", "13x52", "13x82"],
+    "notes": "Özel eksen sırası katalogdaki d x t biçimidir; aynı d için yinelenen satırlar farklı bakla adımı t değerleridir."
+  }
+]

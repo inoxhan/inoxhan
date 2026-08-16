@@ -35,7 +35,14 @@ const BASE_PATH = "/inoxhan";
 const SITE_URL = "https://inoxhan.github.io/inoxhan";
 
 /** Derleme süresince dışarı alınan sunucu rotaları. */
-const CIKARILAN_DIZINLER = ["src/app/panel", "src/app/api", "src/app/katalog-baski"];
+const CIKARILAN_DIZINLER = [
+  "src/app/panel",
+  "src/app/api",
+  "src/app/katalog-baski",
+  // İki kanallı teklif sistemi (sepet + dosya) sunucu ister — statikte eski tek form kalır
+  "src/app/teklif/liste",
+  "src/app/teklif/dosya",
+];
 
 /** Statik dışa aktarımın kabul etmediği segment ayarları — geçici kapatılır. */
 const YAMALAR: { dosya: string; ara: string; koy: string }[] = [
@@ -56,8 +63,10 @@ const YAMALAR: { dosya: string; ara: string; koy: string }[] = [
   },
 ];
 
-/** Derleme sonrası public/'ten silinecek geçici üretimler. */
-const GECICI_PUBLIC = ["public/search-index.json", "public/katalog.pdf"];
+/** Derleme sonrası public/'ten silinecek geçici üretimler.
+ *  katalog.pdf listede DEĞİL — depoda kalıcıdır (Vercel'de PDF üretimi yok);
+ *  katalogPdfKopyala storage'daki daha yeni PDF'i üstüne yazarak tazeler. */
+const GECICI_PUBLIC = ["public/search-index.json"];
 
 function envDosyasindanOku(anahtar: string): string {
   try {

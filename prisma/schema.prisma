@@ -1,14 +1,16 @@
 // İnoxhan — teklif toplama odaklı ürün kataloğu veri modeli
-// SQLite (dev) → Postgres (prod, VPS). SQLite kısıtları: enum yok (String + zod),
-// Json yerine String (JSON.stringify) kullanılır.
+// Postgres (Neon; dev = Neon dev branch, prod = main branch).
+// Taşınabilirlik için enum yerine String + zod, Json yerine String (JSON.stringify)
+// yaklaşımı bilinçli olarak korunur (SQLite döneminden gelen sözleşme).
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // Neon pooled (-pooler) — uygulama trafiği
+  directUrl = env("DIRECT_URL") // Neon direct — migrate/seed/import
 }
 
 model Category {
@@ -47,11 +49,31 @@ model Product {
   drawings   ProductDrawing[]
   documents  ProductDocument[]
   quoteItems QuoteItem[]
+  variants   Variant[]
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
 
   @@index([categoryId])
   @@index([brandId])
+}
+
+/// Ölçü/kalite seviyesinde satış birimi — Excel tam katalogundan içe aktarılır
+/// (scripts/import-varyantlar.ts, ~6.750 satır). Product AİLE seviyesidir ("DIN 84");
+/// varyantlar site sayfası üretmez, yalnız hızlı teklif seçicisinde aranır.
+model Variant {
+  id          String      @id @default(cuid())
+  code        String      @unique // Excel "Ürün Kodu": "084202 005"
+  groupCode   String // Excel "Grup Kodu": "VİDA", "SOMUN"…
+  dinNorm     String // Excel "DIN Normu" (ham): "DIN 84"
+  description String // "INOX SİLİNDİR BAŞ METRİK VİDA M2x5 A2"
+  quality     String? // açıklama sonundan ayrıştırılan "A2" | "A4"
+  isActive    Boolean     @default(true) // --prune: dosyadan düşen kodlar pasifleşir
+  productId   String? // dinNorm → Product.sku eşleşmesi; eşleşmezse null
+  product     Product?    @relation(fields: [productId], references: [id])
+  quoteItems  QuoteItem[]
+
+  @@index([productId])
+  @@index([dinNorm])
 }
 
 model ProductSpec {
@@ -107,13 +129,15 @@ model ProductDocument {
 }
 
 model Customer {
-  id        String         @id @default(cuid())
-  name      String
-  company   String?
-  phone     String         @unique // normalize +905XXXXXXXXX — tekilleştirme anahtarı
-  email     String?
-  createdAt DateTime       @default(now())
-  quotes    QuoteRequest[]
+  id         String         @id @default(cuid())
+  name       String
+  company    String?
+  phone      String         @unique // normalize +905XXXXXXXXX — tekilleştirme anahtarı
+  email      String?
+  address    String? // kargo adresi — hızlı teklif formundan gelir
+  taxOrTcNo  String? // vergi no (şirket) / TC no (birey) — YALNIZ panelden, sipariş aşamasında
+  createdAt  DateTime       @default(now())
+  quotes     QuoteRequest[]
 }
 
 model QuoteRequest {
@@ -121,10 +145,11 @@ model QuoteRequest {
   status         String      @default("YENI") // YENI | BEKLEYEN | CEVAPLANAN (zod korumalı)
   note           String?
   attachmentPath String? // "bana bu ürün lazım" fotoğrafı (özel depolama)
-  source         String      @default("form") // form | product | hero | floating
+  source         String      @default("form") // form | product | hero | floating | liste | dosya
   customerId     String
   customer       Customer    @relation(fields: [customerId], references: [id])
   items          QuoteItem[]
+  attachments    QuoteAttachment[]
   createdAt      DateTime    @default(now()) // geçen süre sayacının kaynağı
   respondedAt    DateTime?
 
@@ -134,13 +159,28 @@ model QuoteRequest {
 model QuoteItem {
   id             String       @id @default(cuid())
   quoteRequestId String
-  productId      String? // null = serbest metin talep
-  freeText       String? // "8'lik dübel, siyah"
+  productId      String? // aile bağlantısı (varyant üzerinden veya doğrudan)
+  variantId      String? // ölçü varyantı — hızlı teklif seçicisinden gelir
+  freeText       String? // "8'lik dübel, siyah" — katalogda olmayan ihtiyaç
   quantity       Int          @default(1)
   unit           String       @default("adet") // adet | kutu | paket
   quality        String? // A2 (AISI 304) | A4 (AISI 316) — zod korumalı
+  order          Int          @default(0) // sepetteki kalem sırası
   quoteRequest   QuoteRequest @relation(fields: [quoteRequestId], references: [id], onDelete: Cascade)
   product        Product?     @relation(fields: [productId], references: [id])
+  variant        Variant?     @relation(fields: [variantId], references: [id])
+}
+
+/// Dosya kanalının (1-3 dosya) ekleri. Eski tek dosyalı akışın
+/// QuoteRequest.attachmentPath alanı geriye uyum için aynen durur.
+model QuoteAttachment {
+  id             String       @id @default(cuid())
+  quoteRequestId String
+  path           String // "uploads/..." (disk) veya Vercel Blob pathname'i
+  order          Int          @default(0)
+  quoteRequest   QuoteRequest @relation(fields: [quoteRequestId], references: [id], onDelete: Cascade)
+
+  @@index([quoteRequestId])
 }
 
 model AnalyticsEvent {

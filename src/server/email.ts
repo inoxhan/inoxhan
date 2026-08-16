@@ -33,6 +33,8 @@ export interface QuoteNotification {
   company: string | null;
   phone: string;
   email: string | null;
+  /** Kargo adresi — iki kanallı sistemde formdan gelir (eski akışta yok). */
+  address?: string | null;
   items: { label: string; quantity: number; unit: string; quality?: string | null }[];
   note: string | null;
   hasAttachment: boolean;
@@ -57,6 +59,7 @@ export async function sendQuoteNotification(q: QuoteNotification): Promise<void>
     `Müşteri : ${q.name}${q.company ? ` — ${q.company}` : ""}`,
     `Telefon : ${formatPhoneTr(q.phone)}`,
     `E-posta : ${q.email ?? "-"}`,
+    ...(q.address ? [`Adres   : ${q.address}`] : []),
     `Kaynak  : ${q.source}`,
     ``,
     `Talep:`,

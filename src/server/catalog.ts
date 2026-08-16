@@ -105,3 +105,64 @@ export async function getSearchIndexData() {
 }
 
 export type SearchIndexItem = Awaited<ReturnType<typeof getSearchIndexData>>[number];
+
+/**
+ * Hızlı teklif seçicisi için varyant indeksi (~6.750 hafif satır).
+ * Görsel aile (Product) seviyesinde tutulur — 54 aile bir kez çekilip map'lenir,
+ * varyant başına join maliyeti ödenmez.
+ */
+export async function getVariantIndexData() {
+  const [variants, aileler] = await Promise.all([
+    db.variant.findMany({
+      where: { isActive: true },
+      select: {
+        code: true,
+        groupCode: true,
+        dinNorm: true,
+        description: true,
+        quality: true,
+        productId: true,
+      },
+      orderBy: { code: "asc" },
+    }),
+    db.product.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        slug: true,
+        category: { select: { slug: true } },
+        images: { where: { isMain: true }, take: 1, select: { basePath: true } },
+        drawings: { where: { kind: "cizim" }, take: 1, select: { basePath: true } },
+      },
+    }),
+  ]);
+
+  const aileMap = new Map(
+    aileler.map((a) => [
+      a.id,
+      {
+        // Fotoğraf yoksa teknik çizim küçük görsel olarak iş görür
+        image: a.images[0]?.basePath ?? a.drawings[0]?.basePath ?? null,
+        productSlug: a.slug,
+        categorySlug: a.category.slug,
+      },
+    ]),
+  );
+
+  return variants.map((v, i) => {
+    const aile = v.productId ? aileMap.get(v.productId) : undefined;
+    return {
+      id: i, // MiniSearch belge kimliği — code @unique ama sayı daha kompakt
+      code: v.code,
+      groupCode: v.groupCode,
+      dinNorm: v.dinNorm,
+      description: v.description,
+      quality: v.quality,
+      image: aile?.image ?? null,
+      productSlug: aile?.productSlug ?? null,
+      categorySlug: aile?.categorySlug ?? null,
+    };
+  });
+}
+
+export type VariantIndexItem = Awaited<ReturnType<typeof getVariantIndexData>>[number];

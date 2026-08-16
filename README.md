@@ -239,6 +239,19 @@ Ayrıntı: `scripts/derle-statik.ts`. Teklif alıcısı `.env` `NOTIFY_EMAIL`
 (boşsa `info@inoxhan.com` gömülür); WhatsApp için `WHATSAPP_NUMBER` doldurup
 yeniden derleyin. Kalıcı çözüm için aşağıdaki VPS bölümü geçerlidir.
 
+## İki kanallı teklif sistemi (sunucu sürümü)
+
+- **/teklif/liste** — hızlı teklif (15-30 dk): tam katalog (~6.750 ölçü varyantı,
+  `npm run import:varyantlar -- --file <xlsx>`) DIN kodu/açıklamayla aranır, tik ile
+  sepete eklenir, tek seferde gönderilir. Sepet localStorage'da (`useQuoteCart`).
+- **/teklif/dosya** — fotoğraf/dosya kanalı: 1-3 dosya; Vercel'de tarayıcıdan doğrudan
+  Blob'a yüklenir (`/api/blob-upload`), lokalde `storage/uploads` diskine düşer.
+  Dönüşün listeli taleplerden uzun olabileceği açıkça belirtilir.
+- Kayıtlar panelde: teklif kalemleri varyant kodlu, müşteri adresli; vergi no/TC
+  teklifte sorulmaz, sipariş aşamasında panel müşteri kartından işlenir.
+- Veritabanı: Neon Postgres (`DATABASE_URL` pooled + `DIRECT_URL`); statik GitHub
+  Pages sürümü bu sistemleri içermez (eski tek formlu akış korunur).
+
 ## Sunucuya taşıma (VPS)
 
 1. `prisma/schema.prisma` içinde `provider = "postgresql"` yapın, `DATABASE_URL`'i güncelleyin,

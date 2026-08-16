@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Mail, MessageCircle, Paperclip, Phone } from "lucide-react";
+import { ArrowLeft, Mail, MapPin, MessageCircle, Paperclip, Phone } from "lucide-react";
 import { ElapsedTimer } from "@/components/panel/ElapsedTimer";
 import { QuoteStatusActions } from "@/components/panel/QuoteStatusActions";
 import { StatusBadge } from "@/components/panel/StatusBadge";
@@ -17,7 +17,11 @@ export default async function TeklifDetayPage({
     where: { id },
     include: {
       customer: true,
-      items: { include: { product: { include: { category: true } } } },
+      items: {
+        include: { product: { include: { category: true } }, variant: true },
+        orderBy: { order: "asc" },
+      },
+      attachments: { orderBy: { order: "asc" } },
     },
   });
   if (!quote) notFound();
@@ -85,6 +89,17 @@ export default async function TeklifDetayPage({
             </a>
           )}
         </div>
+        {quote.customer.address && (
+          <p className="mt-3 flex items-start gap-2 text-sm text-steel-600">
+            <MapPin className="mt-0.5 size-4 shrink-0 text-steel-400" aria-hidden />
+            {quote.customer.address}
+          </p>
+        )}
+        {quote.customer.taxOrTcNo && (
+          <p className="mt-1.5 text-sm text-steel-600">
+            Vergi/TC No: <span className="font-mono">{quote.customer.taxOrTcNo}</span>
+          </p>
+        )}
       </section>
 
       <section className="mt-4 rounded-lg border border-steel-200 bg-white p-5 shadow-card">
@@ -93,19 +108,38 @@ export default async function TeklifDetayPage({
           {quote.items.map((item) => (
             <li key={item.id} className="flex items-center justify-between gap-4 py-3">
               <div className="min-w-0">
-                {item.product ? (
-                  <Link
-                    href={`/urunler/${item.product.category.slug}/${item.product.slug}`}
-                    target="_blank"
-                    className="font-medium text-steel-900 underline-offset-4 hover:underline"
-                  >
-                    {item.product.name}
-                  </Link>
+                {item.variant ? (
+                  <>
+                    <p className="font-medium text-steel-900">{item.variant.description}</p>
+                    <p className="font-mono text-xs text-steel-400">
+                      {item.variant.code}
+                      {item.product && (
+                        <>
+                          {" · "}
+                          <Link
+                            href={`/urunler/${item.product.category.slug}/${item.product.slug}`}
+                            target="_blank"
+                            className="underline-offset-4 hover:underline"
+                          >
+                            {item.product.sku}
+                          </Link>
+                        </>
+                      )}
+                    </p>
+                  </>
+                ) : item.product ? (
+                  <>
+                    <Link
+                      href={`/urunler/${item.product.category.slug}/${item.product.slug}`}
+                      target="_blank"
+                      className="font-medium text-steel-900 underline-offset-4 hover:underline"
+                    >
+                      {item.product.name}
+                    </Link>
+                    <p className="font-mono text-xs text-steel-400">{item.product.sku}</p>
+                  </>
                 ) : (
                   <p className="font-medium text-steel-900">{item.freeText ?? "—"}</p>
-                )}
-                {item.product && (
-                  <p className="font-mono text-xs text-steel-400">{item.product.sku}</p>
                 )}
               </div>
               <div className="shrink-0 text-right">
@@ -126,16 +160,32 @@ export default async function TeklifDetayPage({
             {quote.note}
           </p>
         )}
-        {quote.attachmentPath && (
-          <a
-            href={`/api/files/${quote.attachmentPath}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 inline-flex items-center gap-2 rounded-md border border-steel-200 px-3.5 py-2 text-sm text-steel-700 hover:border-steel-400"
-          >
-            <Paperclip className="size-4" aria-hidden />
-            Ekli dosyayı görüntüle
-          </a>
+        {(quote.attachmentPath || quote.attachments.length > 0) && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {quote.attachmentPath && (
+              <a
+                href={`/api/files/${quote.attachmentPath}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-md border border-steel-200 px-3.5 py-2 text-sm text-steel-700 hover:border-steel-400"
+              >
+                <Paperclip className="size-4" aria-hidden />
+                Ekli dosyayı görüntüle
+              </a>
+            )}
+            {quote.attachments.map((ek, i) => (
+              <a
+                key={ek.id}
+                href={`/api/files/${ek.path}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-md border border-steel-200 px-3.5 py-2 text-sm text-steel-700 hover:border-steel-400"
+              >
+                <Paperclip className="size-4" aria-hidden />
+                Dosya {i + 1}
+              </a>
+            ))}
+          </div>
         )}
       </section>
 
