@@ -58,3 +58,8 @@ resimler ve açıklamalar/
 # Higgsfield ham uretimleri (~300 MB) - islenmis turevler public/media altinda
 tanıtımvideoları/
 
+
+# Baska oturumlarin gecici calisma dosyalari
+tmp/
+outputs/
+
