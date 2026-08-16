@@ -4,6 +4,7 @@ import { SITE } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "KVKK Aydınlatma Metni",
   description: "Kişisel verilerin korunması hakkında aydınlatma metni.",
+  alternates: { canonical: "/kvkk" },
 };
 
 export default function KvkkPage() {
@@ -22,12 +23,14 @@ export default function KvkkPage() {
         </p>
         <p>
           Verileriniz üçüncü kişilerle pazarlama amacıyla paylaşılmaz; yasal
-          yükümlülükler saklıdır. KVKK kapsamındaki haklarınız (bilgi talep
-          etme, düzeltme, silme vb.) için bizimle iletişime geçebilirsiniz.
-        </p>
-        <p className="text-sm text-steel-400">
-          Not: Bu metin taslaktır; firma bilgileri netleştiğinde hukuki
-          danışmanlık ile güncellenmesi önerilir.
+          yükümlülükler saklıdır. KVKK&apos;nın 11. maddesi kapsamındaki
+          haklarınızı (bilgi talep etme, düzeltme, silme, işlemeye itiraz vb.)
+          kullanmak için başvurunuzu{" "}
+          <a href={`mailto:${SITE.email}`} className="underline underline-offset-4">
+            {SITE.email}
+          </a>{" "}
+          adresine iletebilirsiniz; başvurular en geç 30 gün içinde
+          yanıtlanır.
         </p>
       </div>
     </div>

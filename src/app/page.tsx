@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Zap } from "lucide-react";
 import { CategoryHighlights } from "@/components/home/CategoryHighlights";
@@ -17,6 +18,10 @@ import { getSetting } from "@/server/settings";
 
 // Saatte bir tazele; ayrıca panel CRUD'u revalidatePath("/") ile anında tazeler
 export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 /**
  * Video slaytı, klibi henüz üretilmemişse poster görseline düşürülür.

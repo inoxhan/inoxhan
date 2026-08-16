@@ -13,12 +13,13 @@
  *      karışımı; bunu geri almazsak koyu zeminde harflerin çevresinde beyaz hale olur.
  *   3. İçerik kutusuna kırpma — kaynakta logonun etrafında geniş beyaz boşluk var.
  */
-import { mkdir } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 
 const KAYNAK = path.join(process.cwd(), "inoxhan-logo.png");
 const HEDEF_DIR = path.join(process.cwd(), "public", "media", "brand");
+const APP_DIR = path.join(process.cwd(), "src", "app");
 
 /** Bu lumanın altı tam opak sayılır (logonun en açık metalik tonu ~240 ölçüldü). */
 const LUMA_OPAK = 240;
@@ -108,8 +109,59 @@ function inoxBeyazlat(rgba: Buffer, w: number, h: number): number {
   return bolme;
 }
 
+/**
+ * Site ikonu — yazı markası kare favicon'a sığmadığı için logonun imza öğesi
+ * yeniden çizilir: koyu çelik zemin, iki yatay ray, arada metalik "H".
+ * Harf font'suz, saf dikdörtgenlerden kurulur (sharp'ın SVG rasterizasyonu
+ * sistem fontlarına bağımlı kalmasın).
+ *
+ * Üretilenler: src/app/icon.png (512), src/app/apple-icon.png (180),
+ * src/app/favicon.ico (32 px PNG gömülü tek girdili ICO).
+ */
+async function ikonUret() {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="celik" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef1f4"/>
+      <stop offset="0.5" stop-color="#9aa5af"/>
+      <stop offset="0.55" stop-color="#c7cdd4"/>
+      <stop offset="1" stop-color="#e2e6ea"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="#0b0d10"/>
+  <rect x="72" y="112" width="368" height="12" fill="url(#celik)"/>
+  <rect x="72" y="388" width="368" height="12" fill="url(#celik)"/>
+  <rect x="156" y="168" width="58" height="176" fill="url(#celik)"/>
+  <rect x="298" y="168" width="58" height="176" fill="url(#celik)"/>
+  <rect x="214" y="236" width="84" height="40" fill="url(#celik)"/>
+</svg>`;
+  const kaynak = Buffer.from(svg);
+
+  await sharp(kaynak).resize(512, 512).png().toFile(path.join(APP_DIR, "icon.png"));
+  await sharp(kaynak).resize(180, 180).png().toFile(path.join(APP_DIR, "apple-icon.png"));
+
+  // ICO: tek 32 px PNG girdisi (PNG-in-ICO, Vista'dan beri geçerli biçim)
+  const png32 = await sharp(kaynak).resize(32, 32).png().toBuffer();
+  const ico = Buffer.alloc(6 + 16);
+  ico.writeUInt16LE(0, 0); // rezerve
+  ico.writeUInt16LE(1, 2); // tip: ikon
+  ico.writeUInt16LE(1, 4); // girdi sayısı
+  ico.writeUInt8(32, 6); // genişlik
+  ico.writeUInt8(32, 7); // yükseklik
+  ico.writeUInt8(0, 8); // palet
+  ico.writeUInt8(0, 9); // rezerve
+  ico.writeUInt16LE(1, 10); // düzlem
+  ico.writeUInt16LE(32, 12); // bit/piksel
+  ico.writeUInt32LE(png32.length, 14); // veri boyu
+  ico.writeUInt32LE(22, 18); // veri ofseti
+  await writeFile(path.join(APP_DIR, "favicon.ico"), Buffer.concat([ico, png32]));
+
+  console.log("İkonlar hazır: src/app/ [icon.png 512, apple-icon.png 180, favicon.ico 32]");
+}
+
 async function main() {
   await mkdir(HEDEF_DIR, { recursive: true });
+  await ikonUret();
 
   const { data, info } = await sharp(KAYNAK)
     .ensureAlpha()

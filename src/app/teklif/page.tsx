@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Clock, MessageCircle, ShieldCheck, Users } from "lucide-react";
 import { QuoteForm } from "@/components/quote/QuoteForm";
 import { IS_STATIC } from "@/lib/asset";
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
   title: "Hızlı Teklif Al",
   description:
     "İhtiyacını gönder, 15-30 dakika içinde sana özel rekabetçi teklifini al.",
+  alternates: { canonical: "/teklif" },
 };
 
 interface SearchParams {
@@ -102,11 +104,14 @@ export default async function TeklifPage({
 
         {/* Sağ: form */}
         <div className="rounded-lg border border-steel-200 bg-white p-6 shadow-card md:p-8">
-          <QuoteForm
-            preselected={product}
-            preselectedQuality={sp.kalite}
-            source={sp.kaynak === "product" ? "product" : (sp.kaynak ?? "form")}
-          />
+          {/* useSearchParams (statik ürün ön seçimi) prerender'da Suspense sınırı ister */}
+          <Suspense fallback={null}>
+            <QuoteForm
+              preselected={product}
+              preselectedQuality={sp.kalite}
+              source={sp.kaynak === "product" ? "product" : (sp.kaynak ?? "form")}
+            />
+          </Suspense>
         </div>
       </div>
     </div>

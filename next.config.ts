@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 /**
- * STATIC_EXPORT=1 → GitHub Pages statik derlemesi (scripts/derle-github-pages.ts).
+ * STATIC_EXPORT=1 → GitHub Pages statik derlemesi (scripts/derle-statik.ts).
  * Sunucu gerektiren rotalar (panel, api, katalog-baski) derleme sırasında
  * geçici olarak dışarı alınır; teklif aksiyonu WhatsApp/e-posta karşılığına
  * takas edilir. Normal `next dev` / `next build` bu bloktan etkilenmez.

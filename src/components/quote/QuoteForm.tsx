@@ -3,8 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Paperclip, X, Zap } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { asset } from "@/lib/asset";
 import { QuoteSuccess } from "@/components/quote/QuoteSuccess";
 import { Button } from "@/components/ui/Button";
 import { track } from "@/lib/analytics-client";
@@ -76,8 +78,11 @@ export function QuoteForm({
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [productLocked, setProductLocked] = useState(Boolean(preselected));
+  // Statik yayında sorgu dizesi sunucuda okunamıyor; ürün ön seçimi tarayıcıda kurulur
+  const [staticPreselected, setStaticPreselected] = useState<PreselectedProduct | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const submittedRef = useRef(false);
+  const query = useSearchParams();
 
   // form_open (mount) + form_abandon (gönderilmeden sayfadan ayrılma)
   useEffect(() => {
@@ -93,6 +98,7 @@ export function QuoteForm({
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<QuoteFormInput, unknown, QuoteFormValues>({
     resolver: zodResolver(quoteSchema),
@@ -108,6 +114,40 @@ export function QuoteForm({
       source,
     },
   });
+
+  // Statik yayında ?urun=SKU&kalite=A4&kaynak=product ürün detayından geliyor.
+  // Ürün adı, yayında zaten duran arama indeksinden (search-index.json) çözülür;
+  // indeks gelmezse SKU serbest metin alanına düşer — talep yine ürünü taşır.
+  useEffect(() => {
+    if (!IS_STATIC || preselected) return;
+    const sku = query.get("urun");
+    const kalite = query.get("kalite");
+    const kaynak = query.get("kaynak");
+    if (kalite === "A2" || kalite === "A4") setValue("quality", kalite);
+    if (kaynak) setValue("source", kaynak === "product" ? "product" : kaynak);
+    if (!sku) return;
+    let iptal = false;
+    fetch(asset("search-index.json"))
+      .then((r) => r.json())
+      .then((items: { sku: string; name: string }[]) => {
+        if (iptal) return;
+        const urun = items.find((p) => p.sku === sku);
+        if (urun) {
+          setStaticPreselected({ sku: urun.sku, name: urun.name });
+          setProductLocked(true);
+          setValue("productSku", urun.sku);
+        } else {
+          setValue("productText", sku);
+        }
+      })
+      .catch(() => {
+        if (!iptal) setValue("productText", sku);
+      });
+    return () => {
+      iptal = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFileError(null);
@@ -160,7 +200,15 @@ export function QuoteForm({
     }
   });
 
-  if (done) return <QuoteSuccess />;
+  if (done) {
+    return (
+      <QuoteSuccess
+        kanal={done === "eposta" || done === "whatsapp" ? done : undefined}
+      />
+    );
+  }
+
+  const seciliUrun = preselected ?? staticPreselected;
 
   return (
     <form onSubmit={onSubmit} noValidate className="space-y-5">
@@ -168,11 +216,11 @@ export function QuoteForm({
       <input type="hidden" {...register("productSku")} />
 
       {/* Ürün */}
-      {productLocked && preselected ? (
+      {productLocked && seciliUrun ? (
         <div className="flex items-center justify-between gap-3 rounded-md border border-steel-200 bg-steel-100 px-4 py-3">
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-steel-900">{preselected.name}</p>
-            <p className="font-mono text-xs text-steel-500">{preselected.sku}</p>
+            <p className="truncate text-sm font-medium text-steel-900">{seciliUrun.name}</p>
+            <p className="font-mono text-xs text-steel-500">{seciliUrun.sku}</p>
           </div>
           <button
             type="button"
@@ -360,10 +408,18 @@ export function QuoteForm({
         ) : (
           <Zap className="size-5" aria-hidden />
         )}
-        {isSubmitting ? "Gönderiliyor…" : "Teklif Talebini Gönder"}
+        {isSubmitting
+          ? IS_STATIC
+            ? "Hazırlanıyor…"
+            : "Gönderiliyor…"
+          : IS_STATIC
+            ? "Teklif Talebini E-posta ile Gönder"
+            : "Teklif Talebini Gönder"}
       </Button>
       <p className="text-center text-sm text-steel-500">
-        Ortalama tamamlama süresi 45 saniye · 15-30 dakika içinde dönüş
+        {IS_STATIC
+          ? "Talebiniz hazır bir e-posta taslağına dönüştürülür — gönderin, 15-30 dakika içinde dönüş yapalım"
+          : "Ortalama tamamlama süresi 45 saniye · 15-30 dakika içinde dönüş"}
       </p>
     </form>
   );

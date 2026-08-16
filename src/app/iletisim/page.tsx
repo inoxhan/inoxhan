@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Mail } from "lucide-react";
 import { ProductImage } from "@/components/catalog/ProductImage";
 import { buttonStyles } from "@/components/ui/Button";
+import { SITE } from "@/lib/constants";
 import { medyaVar } from "@/server/sayfa-medya";
 
 export const metadata: Metadata = {
   title: "İletişim",
-  description: "İnoxhan iletişim bilgileri ve hızlı teklif kanalları.",
+  description: "İnoxhan'a e-posta ile ulaşın veya teklif formuyla 15-30 dakikada dönüş alın.",
+  alternates: { canonical: "/iletisim" },
 };
 
 const GORSEL = "media/sayfa/iletisim";
@@ -26,6 +29,18 @@ export default function IletisimPage() {
           Hemen Teklif Al
         </Link>
       </div>
+      <a
+        href={`mailto:${SITE.email}`}
+        className="mt-8 flex items-center gap-4 rounded-lg border border-steel-200 bg-white p-5 shadow-card transition-colors hover:border-steel-400"
+      >
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-md bg-steel-950 text-steel-200">
+          <Mail className="size-5" aria-hidden />
+        </span>
+        <span>
+          <span className="block font-semibold text-steel-900">E-posta</span>
+          <span className="block text-steel-600">{SITE.email}</span>
+        </span>
+      </a>
       {medyaVar(GORSEL) && (
         <ProductImage
           basePath={GORSEL}

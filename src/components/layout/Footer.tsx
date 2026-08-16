@@ -33,12 +33,20 @@ export function Footer() {
           </ul>
         </nav>
 
-        <nav aria-label="Yasal" className="text-sm">
-          <p className="mb-3 font-medium text-steel-200">Yasal</p>
-          <ul className="space-y-2">
-            <li><Link href="/kvkk" className="hover:text-steel-100">KVKK Aydınlatma Metni</Link></li>
-          </ul>
-        </nav>
+        <div className="text-sm">
+          <nav aria-label="Yasal">
+            <p className="mb-3 font-medium text-steel-200">Yasal</p>
+            <ul className="space-y-2">
+              <li><Link href="/kvkk" className="hover:text-steel-100">KVKK Aydınlatma Metni</Link></li>
+            </ul>
+          </nav>
+          <div className="mt-8">
+            <p className="mb-3 font-medium text-steel-200">İletişim</p>
+            <a href={`mailto:${SITE.email}`} className="hover:text-steel-100">
+              {SITE.email}
+            </a>
+          </div>
+        </div>
       </div>
       <div className="divider-inox" />
       <div className="mx-auto max-w-7xl px-4 py-5 text-xs sm:px-6">

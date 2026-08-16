@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   title: "Ürün Kataloğu",
   description:
     "İnoxhan ürün kataloğu — paslanmaz çelik bağlantı elemanları, DIN/ISO normları ve QR kodlarla PDF olarak.",
+  alternates: { canonical: "/katalog" },
 };
 
 // Son üretilen kataloğu her istekte diskten kontrol eder

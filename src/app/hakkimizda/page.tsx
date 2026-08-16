@@ -21,6 +21,7 @@ export const metadata: Metadata = {
   description:
     `${SITE.name} — bağlantı elemanlarında 20 yıllık deneyim. Tedarik, ithalat, ` +
     "gümrükleme, depolama, sigorta, lojistik ve uluslararası teslimat tek noktadan.",
+  alternates: { canonical: "/hakkimizda" },
 };
 
 /** Uçtan uca yönetilen süreç — tanıtım metnindeki hizmet zinciri. */

@@ -229,13 +229,15 @@ site `https://inoxhan.github.io/inoxhan/` adresinde yayınlanır.
 Statik sürüm tam siteyi değil, sunucusuz çalışabilen vitrini yayınlar:
 
 - **Çalışır:** tüm sayfalar, 54 ürün + teknik çizimler, arama (istemci tarafı indeks),
-  katalog PDF indirme, SEO (sitemap/robots/JSON-LD).
+  katalog PDF indirme, ürün sayfasından teklif ön seçimi (query istemcide okunur),
+  SEO (sitemap/robots + ürün sayfalarında JSON-LD).
 - **Çalışmaz / düşer:** yönetim paneli ve API yoktur; teklif formu WhatsApp/e-posta
   taslağına düşer (`src/server/actions/quote-static.ts`); analitik ve dosya eki kapalıdır;
   marka filtresi ve sayfalama tek sayfada toplanır.
 
-Ayrıntı: `scripts/derle-statik.ts`. Alıcı e-postası `.env` `NOTIFY_EMAIL`,
-WhatsApp `WHATSAPP_NUMBER` — doldurup yeniden derleyin. Kalıcı çözüm için aşağıdaki VPS bölümü geçerlidir.
+Ayrıntı: `scripts/derle-statik.ts`. Teklif alıcısı `.env` `NOTIFY_EMAIL`
+(boşsa `info@inoxhan.com` gömülür); WhatsApp için `WHATSAPP_NUMBER` doldurup
+yeniden derleyin. Kalıcı çözüm için aşağıdaki VPS bölümü geçerlidir.
 
 ## Sunucuya taşıma (VPS)
 

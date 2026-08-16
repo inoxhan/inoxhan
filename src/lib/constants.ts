@@ -7,6 +7,7 @@ export const SITE = {
   description:
     "Paslanmaz çelik bağlantı elemanları — cıvata, somun, vida, rondela, dübel. DIN ve ISO normlarında A2/A4 kalite. 20 yıllık deneyimle tedarik, ithalat, gümrükleme ve uluslararası teslimat. İhtiyacını gönder, 15-30 dakika içinde sana özel rekabetçi teklifini al.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  email: "info@inoxhan.com",
 } as const;
 
 /**

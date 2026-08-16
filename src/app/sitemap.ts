@@ -23,6 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE.url}/katalog`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE.url}/hakkimizda`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITE.url}/iletisim`, changeFrequency: "yearly", priority: 0.5 },
+    { url: `${SITE.url}/kvkk`, changeFrequency: "yearly", priority: 0.2 },
   ];
 
   return [

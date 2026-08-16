@@ -140,7 +140,7 @@ async function main() {
         NEXT_PUBLIC_SITE_URL: SITE_URL,
         NEXT_PUBLIC_WHATSAPP_NUMBER: envDosyasindanOku("WHATSAPP_NUMBER"),
         NEXT_PUBLIC_QUOTE_EMAIL:
-          envDosyasindanOku("NOTIFY_EMAIL") || "maksu21@gmail.com",
+          envDosyasindanOku("NOTIFY_EMAIL") || "info@inoxhan.com",
       },
     });
     if (sonuc.status !== 0) throw new Error(`next build başarısız (kod ${sonuc.status})`);

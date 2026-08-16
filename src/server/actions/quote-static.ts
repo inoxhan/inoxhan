@@ -51,6 +51,7 @@ export async function submitQuote(formData: FormData): Promise<SubmitQuoteResult
   }
   return {
     ok: false,
-    message: "Şu anda çevrimiçi form kapalı — lütfen bizi telefonla arayın.",
+    message:
+      "Şu anda çevrimiçi form kapalı — talebinizi info@inoxhan.com adresine yazabilirsiniz.",
   };
 }
