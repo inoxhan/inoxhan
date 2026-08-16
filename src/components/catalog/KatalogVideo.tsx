@@ -1,5 +1,6 @@
 "use client";
 
+import { asset } from "@/lib/asset";
 import { useMediaQuery } from "@/lib/use-media-query";
 
 /**
@@ -16,7 +17,7 @@ const WIDTHS = { sm: 480, md: 960, lg: 1600 } as const;
 
 function srcset(ext: "avif" | "webp") {
   return Object.entries(WIDTHS)
-    .map(([suffix, w]) => `/${POSTER}-${suffix}.${ext} ${w}w`)
+    .map(([suffix, w]) => `${asset(`${POSTER}-${suffix}.${ext}`)} ${w}w`)
     .join(", ");
 }
 
@@ -31,7 +32,7 @@ export function KatalogVideo() {
         <source type="image/avif" srcSet={srcset("avif")} sizes="100vw" />
         <source type="image/webp" srcSet={srcset("webp")} sizes="100vw" />
         <img
-          src={`/${POSTER}-lg.webp`}
+          src={asset(`${POSTER}-lg.webp`)}
           alt=""
           decoding="async"
           className="absolute inset-0 size-full object-cover"
@@ -48,13 +49,13 @@ export function KatalogVideo() {
       loop
       playsInline
       preload="metadata"
-      poster={`/${POSTER}-lg.webp`}
+      poster={asset(`${POSTER}-lg.webp`)}
       aria-hidden
       className="absolute inset-0 size-full object-cover"
     >
       {/* WebM önce: destekleyen tarayıcıda tipik olarak ~%30 küçük */}
-      <source src={`/${VIDEO}.webm`} type="video/webm" />
-      <source src={`/${VIDEO}.mp4`} type="video/mp4" />
+      <source src={asset(`${VIDEO}.webm`)} type="video/webm" />
+      <source src={asset(`${VIDEO}.mp4`)} type="video/mp4" />
     </video>
   );
 }

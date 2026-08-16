@@ -3,6 +3,7 @@ import Link from "next/link";
 import { BookOpen, Download, Zap } from "lucide-react";
 import { KatalogVideo } from "@/components/catalog/KatalogVideo";
 import { buttonStyles } from "@/components/ui/Button";
+import { asset, IS_STATIC } from "@/lib/asset";
 import { getLatestCatalogFile } from "@/server/catalog-pdf";
 import { videoVar } from "@/server/sayfa-medya";
 
@@ -50,7 +51,11 @@ export default async function KatalogPage() {
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             {latest ? (
-              <a href="/api/katalog.pdf" className={buttonStyles({ variant: "metallic", size: "lg" })}>
+              // Statik yayında PDF derleme sırasında public/katalog.pdf'e kopyalanır
+              <a
+                href={IS_STATIC ? asset("katalog.pdf") : "/api/katalog.pdf"}
+                className={buttonStyles({ variant: "metallic", size: "lg" })}
+              >
                 <Download className="size-5" aria-hidden />
                 Kataloğu İndir ({fmtSize(latest.sizeBytes)})
               </a>

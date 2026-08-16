@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Clock, MessageCircle, ShieldCheck, Users } from "lucide-react";
 import { QuoteForm } from "@/components/quote/QuoteForm";
+import { IS_STATIC } from "@/lib/asset";
 import { db } from "@/server/db";
 import { getSetting } from "@/server/settings";
 
@@ -21,7 +22,8 @@ export default async function TeklifPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const sp = await searchParams;
+  // Statik yayında sorgu dizesi sunucuda okunamaz — ürün ön seçimi olmadan çalışır
+  const sp: SearchParams = IS_STATIC ? {} : await searchParams;
 
   // Üründen gelindiyse formda önceden seçili gelsin — müşteri tekrar yazmasın
   const product = sp.urun

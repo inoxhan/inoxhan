@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Zap } from "lucide-react";
 import { useCarousel } from "@/components/home/useCarousel";
+import { asset } from "@/lib/asset";
 import { buttonStyles } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
@@ -111,7 +112,7 @@ export function ShowreelSection({ slides }: { slides: ShowreelSlide[] }) {
                 // Bölüm katlamanın ALTINDA — sayfa açılışında hiçbir klip inmemeli.
                 // İndirme yukarıdaki gözlemci play() çağırdığında başlar.
                 preload="none"
-                poster={`/${s.src}-poster-lg.webp`}
+                poster={asset(`${s.src}-poster-lg.webp`)}
                 aria-label={s.alt}
                 // `cover` DEĞİL: bölüm 2.67:1, klip 16:9 → alt kenar kırpılıp norm kodu
                 // etiketleri kayboluyordu, mobilde de duvarın yalnız orta %52'si kalıyordu.
@@ -119,15 +120,15 @@ export function ShowreelSection({ slides }: { slides: ShowreelSlide[] }) {
                 className={cn(ortak, "object-contain")}
               >
                 {/* WebM önce: destekleyen tarayıcıda tipik olarak ~%30 küçük */}
-                <source src={`/${s.src}.webm`} type="video/webm" />
-                <source src={`/${s.src}.mp4`} type="video/mp4" />
+                <source src={asset(`${s.src}.webm`)} type="video/webm" />
+                <source src={asset(`${s.src}.mp4`)} type="video/mp4" />
               </video>
             );
           }
 
           // Ürün fotoğrafları kare ve stüdyo zeminli — `object-cover` ürünü kırpar,
           // bu yüzden still karelerde `contain` kalıyor. Klipler tam kadraj dolduruyor.
-          const src = s.kind === "video" ? `/${s.src}-poster-lg.webp` : `/${s.src}-lg.webp`;
+          const src = asset(s.kind === "video" ? `${s.src}-poster-lg.webp` : `${s.src}-lg.webp`);
           return (
             // eslint-disable-next-line @next/next/no-img-element
             <img

@@ -3,6 +3,8 @@
  * Türevler import pipeline'ında sharp ile üretilir; next/image optimizasyonuna
  * gerek kalmaz (dosyalar zaten optimize).
  */
+import { asset } from "@/lib/asset";
+
 const WIDTHS = { sm: 480, md: 960, lg: 1600 } as const;
 
 interface ProductImageProps {
@@ -15,7 +17,7 @@ interface ProductImageProps {
 
 function srcset(basePath: string, ext: "avif" | "webp") {
   return (Object.keys(WIDTHS) as (keyof typeof WIDTHS)[])
-    .map((s) => `/${basePath}-${s}.${ext} ${WIDTHS[s]}w`)
+    .map((s) => `${asset(`${basePath}-${s}.${ext}`)} ${WIDTHS[s]}w`)
     .join(", ");
 }
 
@@ -45,7 +47,7 @@ export function ProductImage({
       {/* Oranlar üründen ürüne değişiyor (kare, yatay, dikey) — kutuyu saran
           kapsayıcı oranı belirler, görsel object-contain ile içine yerleşir. */}
       <img
-        src={`/${basePath}-md.webp`}
+        src={asset(`${basePath}-md.webp`)}
         alt={alt}
         loading={priority ? "eager" : "lazy"}
         decoding="async"

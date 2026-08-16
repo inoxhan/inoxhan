@@ -24,6 +24,7 @@
     "hazirla:katalog-video": "tsx scripts/hazirla-showreel.ts --katalog",
     "hazirla:kategori": "tsx scripts/hazirla-kategori.ts",
     "hazirla:og": "tsx scripts/hazirla-og.ts",
+    "derle:statik": "tsx scripts/derle-statik.ts",
     "katalog:render": "tsx scripts/katalog-render.ts",
     "katalog:cizim": "tsx scripts/katalog-cizim-cikar.ts",
     "import:cizim": "tsx scripts/import-katalog-cizim.ts"

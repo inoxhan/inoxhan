@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { X, ZoomIn } from "lucide-react";
 import { ProductImage } from "@/components/catalog/ProductImage";
+import { asset } from "@/lib/asset";
 import { cn } from "@/lib/utils";
 
 interface GalleryImage {
@@ -103,7 +104,7 @@ export function ImageGallery({ images }: { images: GalleryImage[] }) {
             <X className="size-6" />
           </button>
           <img
-            src={`/${current.basePath}-lg.webp`}
+            src={asset(`${current.basePath}-lg.webp`)}
             alt={current.alt}
             onClick={(e) => {
               e.stopPropagation();

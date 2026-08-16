@@ -6,11 +6,14 @@ export interface CatalogFilters {
   categorySlug?: string;
   brandSlug?: string;
   page?: number;
+  /** Statik dışa aktarım tüm ürünleri tek sayfada ister — varsayılan PAGE_SIZE. */
+  pageSize?: number;
 }
 
 /** Katalog ızgarası — sunucu sayfalamalı; 456 ürün asla tek seferde yüklenmez. */
 export async function getProducts(filters: CatalogFilters) {
   const page = Math.max(1, filters.page ?? 1);
+  const pageSize = filters.pageSize ?? PAGE_SIZE;
   const where = {
     isActive: true,
     ...(filters.categorySlug && { category: { slug: filters.categorySlug } }),
@@ -27,13 +30,13 @@ export async function getProducts(filters: CatalogFilters) {
         specs: { orderBy: { order: "asc" }, take: 4 },
       },
       orderBy: [{ category: { order: "asc" } }, { name: "asc" }],
-      skip: (page - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
     }),
     db.product.count({ where }),
   ]);
 
-  return { items, total, page, pageCount: Math.max(1, Math.ceil(total / PAGE_SIZE)) };
+  return { items, total, page, pageCount: Math.max(1, Math.ceil(total / pageSize)) };
 }
 
 export type CatalogProduct = Awaited<ReturnType<typeof getProducts>>["items"][number];

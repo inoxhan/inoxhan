@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { QuoteSuccess } from "@/components/quote/QuoteSuccess";
 import { Button } from "@/components/ui/Button";
 import { track } from "@/lib/analytics-client";
+import { IS_STATIC } from "@/lib/asset";
 import {
   QUALITY_HINTS,
   QUALITY_LABELS,
@@ -282,7 +283,8 @@ export function QuoteForm({
         />
       </Field>
 
-      {/* Dosya — "Bana bu ürün lazım" */}
+      {/* Dosya — "Bana bu ürün lazım". Statik yayında sunucu yok, dosya alınamaz. */}
+      {!IS_STATIC && (
       <div>
         <span className="mb-1.5 block text-sm font-medium text-steel-700">
           Fotoğraf / Dosya <span className="font-normal text-steel-400">(opsiyonel)</span>
@@ -321,6 +323,7 @@ export function QuoteForm({
         </label>
         {fileError && <p className="mt-1 text-sm text-status-overdue">{fileError}</p>}
       </div>
+      )}
 
       {/* KVKK */}
       <label className="flex items-start gap-3 text-sm text-steel-600">

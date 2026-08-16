@@ -1,3 +1,4 @@
+import { IS_STATIC } from "@/lib/asset";
 import type { EventType } from "@/lib/constants";
 
 /**
@@ -20,6 +21,8 @@ function sid(): string {
 
 export function track(type: EventType, payload: Record<string, string | number> = {}): void {
   if (typeof window === "undefined") return;
+  // Statik yayında (GitHub Pages) /api/event yok — olaylar sessizce atlanır
+  if (IS_STATIC) return;
   try {
     const body = JSON.stringify({
       type,

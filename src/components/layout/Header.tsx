@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X, Zap } from "lucide-react";
 import { buttonStyles } from "@/components/ui/Button";
+import { asset } from "@/lib/asset";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -26,7 +27,7 @@ export function Header() {
               next/image kullanılmaz — türev zaten optimize, tek dosya. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/media/brand/inoxhan-logo-sm.webp"
+            src={asset("media/brand/inoxhan-logo-sm.webp")}
             alt="İnoxhan"
             width={185}
             height={32}

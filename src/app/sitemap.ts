@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 import { SITE } from "@/lib/constants";
 import { db } from "@/server/db";
 
+// Statik dışa aktarım (output: export) metadata rotalarında bunu açıkça ister
+export const dynamic = "force-static";
 // Ürün eklenince/değişince en geç 1 saat içinde sitemap tazelenir
 export const revalidate = 3600;
 

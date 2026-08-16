@@ -12,6 +12,7 @@ import {
 import { ProductImage } from "@/components/catalog/ProductImage";
 import { Reveal } from "@/components/home/Reveal";
 import { buttonStyles } from "@/components/ui/Button";
+import { asset } from "@/lib/asset";
 import { SITE } from "@/lib/constants";
 import { medyaVar } from "@/server/sayfa-medya";
 
@@ -45,7 +46,7 @@ const BANNER_WIDTHS = { md: 1280, lg: 1920, xl: 2560 } as const;
 
 function bannerSrcset(ext: "avif" | "webp") {
   return Object.entries(BANNER_WIDTHS)
-    .map(([suffix, w]) => `/${BANNER}-${suffix}.${ext} ${w}w`)
+    .map(([suffix, w]) => `${asset(`${BANNER}-${suffix}.${ext}`)} ${w}w`)
     .join(", ");
 }
 
@@ -63,7 +64,7 @@ export default function HakkimizdaPage() {
             <source type="image/avif" srcSet={bannerSrcset("avif")} sizes="100vw" />
             <source type="image/webp" srcSet={bannerSrcset("webp")} sizes="100vw" />
             <img
-              src={`/${BANNER}-lg.webp`}
+              src={asset(`${BANNER}-lg.webp`)}
               alt=""
               decoding="async"
               className="absolute inset-0 size-full object-cover opacity-70"

@@ -67,6 +67,18 @@ async function main() {
     }
   }
 
+  // ── Katalog arka planı (hazır klip) ──
+  const katalog = kaynakBul("katalog", "katalog");
+  if (katalog) {
+    // Ping-pong YOK: klip 20 sn — döngü dikişi bu uzunlukta zaten nadiren yakalanıyor,
+    // ters kopya eklemek yalnız dosyayı ikiye katlardı. crf 28: arka planda karartma
+    // altında oynuyor, showreel'den bir kademe kısık kalite fark edilmiyor.
+    console.log("\nKatalog arka planı: hazır klip bulundu");
+    await kodla(katalog, "katalog-duvar", { oran: 16 / 9, sinirMB: 4, crf: 28 });
+  } else {
+    console.log("\nKatalog arka planı kaynağı yok — montaj: npm run hazirla:katalog-video");
+  }
+
   console.log("\nVideolar hazır → public/media/video/");
 }
 

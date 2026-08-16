@@ -10,6 +10,7 @@ import {
   type SearchIndexItem,
 } from "@/lib/search-client";
 import { track } from "@/lib/analytics-client";
+import { asset, IS_STATIC } from "@/lib/asset";
 
 /**
  * Katalog arama kabuğu: yazmaya başlayınca sunucu ızgarasını (children)
@@ -26,7 +27,8 @@ export function CatalogSearch({ children }: { children: ReactNode }) {
   function ensureIndex() {
     if (miniRef.current || loadPromise.current) return loadPromise.current;
     setLoading(true);
-    loadPromise.current = fetch("/api/search-index")
+    // Statik yayında indeks derleme sırasında public/search-index.json'a yazılır
+    loadPromise.current = fetch(IS_STATIC ? asset("search-index.json") : "/api/search-index")
       .then((r) => r.json())
       .then((items: SearchIndexItem[]) => {
         miniRef.current = buildSearchIndex(items);

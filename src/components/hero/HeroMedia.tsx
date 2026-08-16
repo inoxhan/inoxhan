@@ -1,6 +1,7 @@
 "use client";
 
 import { Hero3D } from "@/components/hero/Hero3D";
+import { asset } from "@/lib/asset";
 import type { HeroMedia as HeroMediaType } from "@/lib/constants";
 import { useMediaQuery } from "@/lib/use-media-query";
 
@@ -23,7 +24,7 @@ const HERO_MOBIL_WIDTHS = { sm: 720, md: 1080, lg: 1440 } as const;
 
 function srcset(basePath: string, ext: "avif" | "webp", widths: Record<string, number>) {
   return Object.entries(widths)
-    .map(([suffix, w]) => `/${basePath}-${suffix}.${ext} ${w}w`)
+    .map(([suffix, w]) => `${asset(`${basePath}-${suffix}.${ext}`)} ${w}w`)
     .join(", ");
 }
 
@@ -62,7 +63,7 @@ function HeroPicture({
       <source type="image/avif" srcSet={srcset(src, "avif", HERO_WIDTHS)} sizes="100vw" />
       <source type="image/webp" srcSet={srcset(src, "webp", HERO_WIDTHS)} sizes="100vw" />
       <img
-        src={`/${src}-lg.webp`}
+        src={asset(`${src}-lg.webp`)}
         alt=""
         loading={priority ? "eager" : "lazy"}
         fetchPriority={priority ? "high" : "auto"}
@@ -102,13 +103,13 @@ function HeroVideo({
       loop
       playsInline
       preload={priority ? "auto" : "metadata"}
-      poster={`/${media.poster}-lg.webp`}
+      poster={asset(`${media.poster}-lg.webp`)}
       aria-hidden
       className="absolute inset-0 size-full object-cover"
     >
       {/* WebM önce: destekleyen tarayıcıda tipik olarak ~%30 küçük */}
-      <source src={`/${media.src}.webm`} type="video/webm" />
-      <source src={`/${media.src}.mp4`} type="video/mp4" />
+      <source src={asset(`${media.src}.webm`)} type="video/webm" />
+      <source src={asset(`${media.src}.mp4`)} type="video/mp4" />
     </video>
   );
 }

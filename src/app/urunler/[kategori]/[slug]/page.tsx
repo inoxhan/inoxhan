@@ -6,13 +6,24 @@ import { ImageGallery } from "@/components/catalog/ImageGallery";
 import { ProductImage } from "@/components/catalog/ProductImage";
 import { QualityPicker } from "@/components/catalog/QualityPicker";
 import { SpecTable } from "@/components/catalog/SpecTable";
+import { asset } from "@/lib/asset";
 import { SITE } from "@/lib/constants";
 import { getProductBySlug } from "@/server/catalog";
+import { db } from "@/server/db";
 import { getSetting } from "@/server/settings";
 
 interface Params {
   kategori: string;
   slug: string;
+}
+
+/** Statik dışa aktarım her ürün sayfasını derlemede üretir; sunucu modunda da ısınma sağlar. */
+export async function generateStaticParams(): Promise<Params[]> {
+  const products = await db.product.findMany({
+    where: { isActive: true },
+    select: { slug: true, category: { select: { slug: true } } },
+  });
+  return products.map((p) => ({ kategori: p.category.slug, slug: p.slug }));
 }
 
 export async function generateMetadata({
@@ -36,7 +47,7 @@ export async function generateMetadata({
   const ogGorsel =
     ana && ogGenislik > 0
       ? {
-          url: `/${ana.basePath}-lg.webp`,
+          url: asset(`${ana.basePath}-lg.webp`),
           width: ogGenislik,
           height: Math.round((ana.height * ogGenislik) / ana.width),
         }
@@ -192,7 +203,7 @@ export default async function UrunDetayPage({ params }: { params: Promise<Params
                 {product.documents.map((doc) => (
                   <li key={doc.id}>
                     <a
-                      href={`/${doc.filePath}`}
+                      href={asset(doc.filePath)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-steel-700 underline-offset-4 hover:underline"
@@ -246,7 +257,7 @@ export default async function UrunDetayPage({ params }: { params: Promise<Params
                   Ölçü Tablosu
                 </h3>
                 <a
-                  href={`/${dimensionTable.basePath}-full.webp`}
+                  href={asset(`${dimensionTable.basePath}-full.webp`)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex shrink-0 items-center gap-1.5 text-sm text-steel-600 underline-offset-4 hover:underline"

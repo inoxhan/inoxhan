@@ -175,9 +175,10 @@ ikisi de aynı çıktı adlarına yazar, **en son çalıştırılan kazanır**:
   kodlar (şu an sitede olan bu: kullanıcının Higgsfield'de ürettiği üç sinematik klip)
 - `npm run hazirla:showreel` — 54 ürünün gerçek fotoğraflarından **montajlar**
 
-`/katalog` sayfasının arka plan videosu da aynı duvardan üretilir
-(`hazirla:katalog-video`): yazısız, yavaş süzülme, ping-pong ile 12 sn dikişsiz döngü.
-Video yoksa bant düz koyu kalır; mobil videoyu hiç indirmez, poster gösterir.
+`/katalog` sayfasının arka plan videosu için de aynı ikili düzen geçerli:
+`import/higgsfield/katalog/katalog.mp4` varsa `hazirla:video` onu kodlar (şu an sitede
+olan bu), yoksa `hazirla:katalog-video` 54 ürünlük duvardan yazısız bir süzülme montajlar.
+Video hiç yoksa bant düz koyu kalır; mobil videoyu hiç indirmez, poster gösterir.
 
 ### Montaj — neden metin prompt'uyla AI klip değil
 
@@ -219,6 +220,22 @@ girmez — yalnız web sayfasında, tam çözünürlükte "Büyüt" bağlantıs�
   WhatsApp butonları görünür olur.
 - **CRM:** `CRM_WEBHOOK_URL` + `CRM_WEBHOOK_SECRET` girilince her teklif HMAC-SHA256
   imzalı JSON olarak POST edilir (`x-inoxhan-signature` başlığı).
+
+## GitHub Pages (statik vitrin)
+
+`npm run derle:statik` → `out/` klasörünü üretir → içeriği `gh-pages` dalına itilir →
+site `https://inoxhan.github.io/inoxhan/` adresinde yayınlanır.
+
+Statik sürüm tam siteyi değil, sunucusuz çalışabilen vitrini yayınlar:
+
+- **Çalışır:** tüm sayfalar, 54 ürün + teknik çizimler, arama (istemci tarafı indeks),
+  katalog PDF indirme, SEO (sitemap/robots/JSON-LD).
+- **Çalışmaz / düşer:** yönetim paneli ve API yoktur; teklif formu WhatsApp/e-posta
+  taslağına düşer (`src/server/actions/quote-static.ts`); analitik ve dosya eki kapalıdır;
+  marka filtresi ve sayfalama tek sayfada toplanır.
+
+Ayrıntı: `scripts/derle-statik.ts`. Alıcı e-postası `.env` `NOTIFY_EMAIL`,
+WhatsApp `WHATSAPP_NUMBER` — doldurup yeniden derleyin. Kalıcı çözüm için aşağıdaki VPS bölümü geçerlidir.
 
 ## Sunucuya taşıma (VPS)
 

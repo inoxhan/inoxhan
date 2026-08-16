@@ -3,6 +3,7 @@ import { CatalogSearch } from "@/components/catalog/CatalogSearch";
 import { FilterPanel } from "@/components/catalog/FilterPanel";
 import { Pagination } from "@/components/catalog/Pagination";
 import { ProductGrid } from "@/components/catalog/ProductGrid";
+import { IS_STATIC } from "@/lib/asset";
 import { getBrands, getCategories, getProducts } from "@/server/catalog";
 
 export const metadata: Metadata = {
@@ -22,13 +23,14 @@ export default async function UrunlerPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const sp = await searchParams;
+  // Statik yayında sorgu dizesi sunucuda okunamaz — tüm ürünler tek sayfada listelenir
+  const sp: SearchParams = IS_STATIC ? {} : await searchParams;
   const page = Number(sp.sayfa) || 1;
 
   const [categories, brands, result] = await Promise.all([
     getCategories(),
     getBrands(),
-    getProducts({ brandSlug: sp.marka, page }),
+    getProducts({ brandSlug: sp.marka, page, ...(IS_STATIC && { pageSize: 1000 }) }),
   ]);
 
   const makeHref = (p: number) => {

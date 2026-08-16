@@ -6,12 +6,14 @@ import { CatalogSearch } from "@/components/catalog/CatalogSearch";
 import { FilterPanel } from "@/components/catalog/FilterPanel";
 import { Pagination } from "@/components/catalog/Pagination";
 import { ProductGrid } from "@/components/catalog/ProductGrid";
+import { IS_STATIC } from "@/lib/asset";
 import {
   getBrands,
   getCategories,
   getCategoryBySlug,
   getProducts,
 } from "@/server/catalog";
+import { db } from "@/server/db";
 
 interface Params {
   kategori: string;
@@ -19,6 +21,11 @@ interface Params {
 interface SearchParams {
   marka?: string;
   sayfa?: string;
+}
+
+export async function generateStaticParams(): Promise<Params[]> {
+  const categories = await db.category.findMany({ select: { slug: true } });
+  return categories.map((c) => ({ kategori: c.slug }));
 }
 
 export async function generateMetadata({
@@ -44,7 +51,8 @@ export default async function KategoriPage({
   searchParams: Promise<SearchParams>;
 }) {
   const { kategori } = await params;
-  const sp = await searchParams;
+  // Statik yayında sorgu dizesi sunucuda okunamaz — filtre/sayfalama tek sayfada toplanır
+  const sp: SearchParams = IS_STATIC ? {} : await searchParams;
   const category = await getCategoryBySlug(kategori);
   if (!category) notFound();
 
@@ -52,7 +60,12 @@ export default async function KategoriPage({
   const [categories, brands, result] = await Promise.all([
     getCategories(),
     getBrands(),
-    getProducts({ categorySlug: kategori, brandSlug: sp.marka, page }),
+    getProducts({
+      categorySlug: kategori,
+      brandSlug: sp.marka,
+      page,
+      ...(IS_STATIC && { pageSize: 1000 }),
+    }),
   ]);
 
   const makeHref = (p: number) => {

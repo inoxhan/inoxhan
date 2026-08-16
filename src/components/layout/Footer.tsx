@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { asset } from "@/lib/asset";
 import { SITE } from "@/lib/constants";
 
 export function Footer() {
@@ -8,7 +9,7 @@ export function Footer() {
         <div className="md:col-span-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/media/brand/inoxhan-logo-sm.webp"
+            src={asset("media/brand/inoxhan-logo-sm.webp")}
             alt="İnoxhan"
             width={162}
             height={28}
