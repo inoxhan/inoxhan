@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Hero3D } from "@/components/hero/Hero3D";
 import { asset } from "@/lib/asset";
 import type { HeroMedia as HeroMediaType } from "@/lib/constants";
@@ -75,11 +76,16 @@ function HeroPicture({
 }
 
 /**
- * Hero videosu — yalnız geniş ekranda ve hareket azaltma tercihi yokken oynatılır.
+ * Hero videosu — yalnız geniş ekranda, hareket azaltma tercihi yokken ve sayfa
+ * boşa çıktıktan SONRA yüklenir.
  *
  * `useMediaQuery` sunucuda ve ilk boyamada `false` döner: herkes önce poster karesini
  * görür, masaüstü hidrasyondan sonra videoya geçer. Mobil videoyu HİÇ indirmez —
  * birkaç MB'lik arka plan videosu hücresel bağlantıda ödenecek bir bedel değil.
+ *
+ * Gecikmeli mount: video ~800 KB ve sayfayla aynı anda inince açılış takılıyordu.
+ * Poster hemen görünür, video tarayıcı boşa çıkınca (requestIdleCallback) devreye
+ * girer. Veri tasarrufu/yavaş bağlantıda hiç yüklenmez.
  */
 function HeroVideo({
   media,
@@ -90,8 +96,32 @@ function HeroVideo({
 }) {
   const wide = useMediaQuery("(min-width: 768px)");
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const [videoyaGec, setVideoyaGec] = useState(false);
 
-  if (!wide || reducedMotion) {
+  useEffect(() => {
+    if (!wide || reducedMotion) return;
+
+    const baglanti = (
+      navigator as Navigator & {
+        connection?: { saveData?: boolean; effectiveType?: string };
+      }
+    ).connection;
+    if (baglanti?.saveData || /2g/.test(baglanti?.effectiveType ?? "")) return;
+
+    const idle = (
+      window as Window & {
+        requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
+      }
+    ).requestIdleCallback;
+    if (idle) {
+      const id = idle(() => setVideoyaGec(true), { timeout: 3000 });
+      return () => (window as Window & { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback?.(id);
+    }
+    const t = setTimeout(() => setVideoyaGec(true), 1500);
+    return () => clearTimeout(t);
+  }, [wide, reducedMotion]);
+
+  if (!wide || reducedMotion || !videoyaGec) {
     return <HeroPicture src={media.poster} srcMobile={media.srcMobile} priority={priority} />;
   }
 
@@ -102,7 +132,7 @@ function HeroVideo({
       muted
       loop
       playsInline
-      preload={priority ? "auto" : "metadata"}
+      preload="auto"
       poster={asset(`${media.poster}-lg.webp`)}
       aria-hidden
       className="absolute inset-0 size-full object-cover"

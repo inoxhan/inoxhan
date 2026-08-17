@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Loader2, Plus, Search, X } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { useDeferredValue, useEffect, useMemo } from "react";
 import { ProductImage } from "@/components/catalog/ProductImage";
 import type { VariantIndex } from "@/components/quote/useVariantIndex";
 import { filtreleVaryantlar } from "@/lib/varyant-filtre";
@@ -29,22 +29,24 @@ export function VariantPicker({
 }) {
   const { items, ensure, loading, error } = index;
   const searching = query.trim().length >= 2;
+  // Yazma her zaman akıcı kalsın: 6.750 satırlık süzme bir sonraki boş ana ertelenir
+  const ertelenmis = useDeferredValue(query);
 
   const birincil = useMemo(
     () =>
       searching && items
-        ? filtreleVaryantlar(items, query)
+        ? filtreleVaryantlar(items, ertelenmis)
         : { items: [], capSuzuldu: false, toplam: 0 },
-    [searching, items, query],
+    [searching, items, ertelenmis],
   );
 
   // Yalnız birebir eşleşme yoksa: yazım hatası toleranslı arama
   const yedek = useMemo(
     () =>
       searching && items && birincil.toplam === 0
-        ? searchVariants(yedekIndeks(items), query.trim())
+        ? searchVariants(yedekIndeks(items), ertelenmis.trim())
         : [],
-    [searching, items, birincil.toplam, query],
+    [searching, items, birincil.toplam, ertelenmis],
   );
 
   const results: VariantIndexItem[] = birincil.toplam > 0 ? birincil.items : yedek;

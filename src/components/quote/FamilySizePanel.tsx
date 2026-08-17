@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowLeft, Check, Loader2, Plus, Search, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { ProductImage } from "@/components/catalog/ProductImage";
 import { QtyInput } from "@/components/quote/QtyInput";
 import type { VariantIndex } from "@/components/quote/useVariantIndex";
@@ -37,6 +37,8 @@ export function FamilySizePanel({
   const [filtre, setFiltre] = useState("");
   const [kalite, setKalite] = useState<string | null>(initialQuality);
   const { items, loading, error, ensure } = index;
+  // Kalabalık ailelerde (500+ ölçü) süzme yazmayı takılatmasın
+  const ertelenmisFiltre = useDeferredValue(filtre);
 
   useEffect(() => {
     void ensure();
@@ -60,11 +62,11 @@ export function FamilySizePanel({
   // Arama kutusuyla AYNI eşleştirme: panelde "8" yazınca M18 değil M8 kalır
   const sonuc = useMemo(() => {
     const kaliteliler = kalite ? olculer.filter((v) => v.quality === kalite) : olculer;
-    if (!filtre.trim()) {
+    if (!ertelenmisFiltre.trim()) {
       return { items: kaliteliler.slice(0, MAX_SATIR), capSuzuldu: false, toplam: kaliteliler.length };
     }
-    return filtreleVaryantlar(kaliteliler, filtre, MAX_SATIR);
-  }, [olculer, filtre, kalite]);
+    return filtreleVaryantlar(kaliteliler, ertelenmisFiltre, MAX_SATIR);
+  }, [olculer, ertelenmisFiltre, kalite]);
   const gorunen = sonuc.items;
 
   return (
