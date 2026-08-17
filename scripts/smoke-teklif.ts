@@ -34,36 +34,64 @@ async function main() {
     if (m.type() === "error") konsolHatalari.push(m.text());
   });
 
-  console.log("1) Sayfa ve ızgara");
+  console.log("1) Sayfa ve ürün listesi");
   await page.goto(`${BASE}/teklif`, { waitUntil: "networkidle" });
-  const kartSayisi = await page.locator("ul li button[aria-pressed]").count();
-  kontrol("54 ürün kartı basıldı", kartSayisi >= 54, `${kartSayisi} kart`);
+  const urunSayisi = await page.locator("ul li button[aria-pressed]").count();
+  kontrol("54 ürün satırı basıldı", urunSayisi >= 54, `${urunSayisi} satır`);
 
   await page.getByRole("button", { name: /^Cıvatalar/ }).click();
-  const filtreliKart = await page.locator("ul li button[aria-pressed]").count();
-  kontrol("kategori çipi ızgarayı süzdü", filtreliKart > 0 && filtreliKart < kartSayisi, `${filtreliKart} kart`);
+  const filtreli = await page.locator("ul li button[aria-pressed]").count();
+  kontrol("kategori çipi listeyi süzdü", filtreli > 0 && filtreli < urunSayisi, `${filtreli} satır`);
 
-  console.log("2) Ölçü paneli");
+  console.log("2) Ölçü paneli (sağ sütun, sayfa kaymadan)");
+  const oncekiScroll = await page.evaluate("Math.round(window.scrollY)");
   await page.locator("ul li button[aria-pressed]").filter({ hasText: "DIN 933" }).first().click();
   const panel = page.locator("#olcu-paneli");
   await panel.waitFor({ state: "visible", timeout: 20_000 });
   await panel.locator("li").first().waitFor({ timeout: 30_000 });
+  await page.waitForTimeout(600);
+  const sonrakiScroll = await page.evaluate("Math.round(window.scrollY)");
+  kontrol("sayfa aşağı kaymadı", oncekiScroll === sonrakiScroll, `${oncekiScroll} → ${sonrakiScroll}`);
+
+  const panelKutu = await panel.boundingBox();
+  const listeKutu = await page.locator("ul li button[aria-pressed]").first().boundingBox();
+  kontrol(
+    "ölçü paneli sağ sütunda",
+    (panelKutu?.x ?? 0) > (listeKutu?.x ?? 0) + 200,
+    `panel x=${Math.round(panelKutu?.x ?? 0)}`,
+  );
+
   const olcuSayisi = await panel.locator("li").count();
   kontrol("ailenin ölçüleri listelendi", olcuSayisi > 10, `${olcuSayisi} satır`);
 
-  await panel.locator('input[type="search"]').fill("M8x40");
-  await page.waitForTimeout(300);
+  await panel.locator('input[type="search"]').fill("8x40");
+  await page.waitForTimeout(400);
   const suzulen = await panel.locator("li").count();
   kontrol("ölçü filtresi çalıştı", suzulen > 0 && suzulen < olcuSayisi, `${suzulen} satır`);
 
   const ilkSatir = panel.locator("li").first();
-  await ilkSatir.locator('input[type="number"]').fill("100");
+  const adetKutusu = ilkSatir.locator('input[inputmode="numeric"]');
+  await adetKutusu.click();
+  await adetKutusu.press("Control+a");
+  await adetKutusu.press("Backspace");
+  kontrol("adet kutusu boşaltılabiliyor", (await adetKutusu.inputValue()) === "");
+  await adetKutusu.type("100");
+  kontrol("adet doğrudan yazılabiliyor", (await adetKutusu.inputValue()) === "100");
   await ilkSatir.getByRole("button", { name: /listeye ekle/i }).click();
   await page.screenshot({ path: path.join(SHOT_DIR, "teklif-olcu-paneli.png"), fullPage: false });
 
-  console.log("3) Arama kutusundan ikinci kalem");
-  await page.locator('input[aria-label="Ürün ara"]').fill("DIN 934 M8");
-  await page.waitForTimeout(800);
+  console.log("3) Arama kutusundan ikinci kalem (kademeli daraltma)");
+  const arama = page.locator('input[aria-label="Ürün ara"]');
+  await arama.fill("934");
+  await page.waitForTimeout(700);
+  const genis = await page.locator("li").filter({ hasText: /DIN 934/ }).count();
+  await arama.fill("934 8");
+  await page.waitForTimeout(700);
+  const dar = await page.locator("li").filter({ hasText: /DIN 934/ }).count();
+  kontrol("ikinci kelime sonucu daralttı", dar < genis, `${genis} → ${dar}`);
+  const yanlisNorm = await page.locator("li").filter({ hasText: /DIN 933|DIN 931/ }).count();
+  kontrol("komşu normlar karışmadı", yanlisNorm === 0, `${yanlisNorm} yabancı satır`);
+
   await page
     .locator("li")
     .filter({ hasText: /DIN 934/ })

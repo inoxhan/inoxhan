@@ -3,11 +3,28 @@ import { normalizeTr } from "@/lib/slugify-tr";
 import type { VariantIndexItem } from "@/server/catalog";
 
 /**
- * Hızlı teklif seçicisinin istemci tarafı araması — search-client.ts ile aynı
- * ilkeler: normalizeTr, AND-öncelikli sorgu, kod en güçlü sinyal.
- * ~6.750 varyantta MiniSearch indeksi tarayıcıda sorunsuz kurulur.
+ * YEDEK arama — yalnız birebir eşleştirme (varyant-filtre.ts) sonuç bulamadığında
+ * çalışır: yazım hatalarını (fuzzy) ve ön ek eşleşmesini tolere eder.
+ * Asıl arama artık kademeli daraltan, tahmin edilebilir filtredir; MiniSearch'ün
+ * fuzzy davranışı "933 yazana 934 gösterme" sorununu yaratıyordu.
+ * ~6.750 varyantta indeks tarayıcıda sorunsuz kurulur.
  */
 export type { VariantIndexItem };
+
+/**
+ * MiniSearch indeksi maliyetlidir (~6.750 belge); aynı liste için bir kez kurulup
+ * saklanır. WeakMap sayesinde render sırasında güvenle çağrılabilir (saf, idempotent).
+ */
+const yedekIndeksler = new WeakMap<object, MiniSearch<VariantIndexItem>>();
+
+export function yedekIndeks(items: VariantIndexItem[]): MiniSearch<VariantIndexItem> {
+  let mevcut = yedekIndeksler.get(items);
+  if (!mevcut) {
+    mevcut = buildVariantIndex(items);
+    yedekIndeksler.set(items, mevcut);
+  }
+  return mevcut;
+}
 
 export function buildVariantIndex(items: VariantIndexItem[]) {
   const mini = new MiniSearch<VariantIndexItem>({

@@ -2,6 +2,7 @@
 
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { ProductImage } from "@/components/catalog/ProductImage";
+import { QtyInput } from "@/components/quote/QtyInput";
 import { QUOTE_UNITS } from "@/lib/constants";
 import type { CartItem } from "@/components/quote/useQuoteCart";
 
@@ -72,13 +73,11 @@ export function QuoteCart({
               >
                 <Minus className="size-3.5" />
               </button>
-              <input
-                type="number"
-                min={1}
+              <QtyInput
                 value={item.qty}
-                onChange={(e) => onQty(i, Number(e.target.value) || 1)}
-                className="h-8 w-14 border-x border-steel-200 text-center text-sm text-steel-900 focus:outline-none"
-                aria-label="Adet"
+                onChange={(qty) => onQty(i, qty)}
+                ariaLabel={`${item.description} adet`}
+                className="h-8 w-14 rounded-none border-x border-y-0 border-steel-200"
               />
               <button
                 type="button"

@@ -3,12 +3,13 @@
 import { ArrowLeft, Check, Loader2, Plus, Search, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ProductImage } from "@/components/catalog/ProductImage";
+import { QtyInput } from "@/components/quote/QtyInput";
 import type { VariantIndex } from "@/components/quote/useVariantIndex";
 import { QUALITY_LABELS, QUALITY_OPTIONS } from "@/lib/constants";
 import { onEkiAt, ortakOnEk } from "@/lib/ortak-onek";
-import { normalizeTr } from "@/lib/slugify-tr";
 import { cn } from "@/lib/utils";
 import type { VariantIndexItem } from "@/lib/variant-search-client";
+import { filtreleVaryantlar } from "@/lib/varyant-filtre";
 import type { QuoteFamily } from "@/server/catalog";
 
 /** Tek seferde basılan azami satır — kalabalık ailelerde filtreye yönlendirir. */
@@ -56,21 +57,22 @@ export function FamilySizePanel({
   // Filtreden bağımsız hesaplanır ki süzerken satır etiketi değişmesin
   const onEk = useMemo(() => ortakOnEk(olculer.map((v) => v.description)), [olculer]);
 
-  const gorunen = useMemo(() => {
-    const q = normalizeTr(filtre.trim());
-    return olculer.filter((v) => {
-      if (kalite && v.quality !== kalite) return false;
-      if (!q) return true;
-      return normalizeTr(`${v.description} ${v.code}`).includes(q);
-    });
+  // Arama kutusuyla AYNI eşleştirme: panelde "8" yazınca M18 değil M8 kalır
+  const sonuc = useMemo(() => {
+    const kaliteliler = kalite ? olculer.filter((v) => v.quality === kalite) : olculer;
+    if (!filtre.trim()) {
+      return { items: kaliteliler.slice(0, MAX_SATIR), capSuzuldu: false, toplam: kaliteliler.length };
+    }
+    return filtreleVaryantlar(kaliteliler, filtre, MAX_SATIR);
   }, [olculer, filtre, kalite]);
+  const gorunen = sonuc.items;
 
   return (
     <section
       id="olcu-paneli"
-      className="mt-5 scroll-mt-24 rounded-lg border-2 border-steel-950 bg-white p-4 shadow-elevated sm:p-5"
+      className="rounded-lg border-2 border-steel-950 bg-white p-4 shadow-elevated"
     >
-      {/* Mobilde ızgara gizlendiği için geri dönüş yolu burada durmalı */}
+      {/* Mobilde ürün listesi gizlendiği için geri dönüş yolu burada durmalı */}
       <button
         type="button"
         onClick={onClose}
@@ -157,8 +159,8 @@ export function FamilySizePanel({
 
       {items && olculer.length > 0 && (
         <>
-          <ul className="mt-3 max-h-[420px] divide-y divide-steel-100 overflow-y-auto rounded-md border border-steel-200">
-            {gorunen.slice(0, MAX_SATIR).map((v) => (
+          <ul className="mt-3 max-h-[40vh] divide-y divide-steel-100 overflow-y-auto rounded-md border border-steel-200">
+            {gorunen.map((v) => (
               <SizeRow
                 key={v.code}
                 variant={v}
@@ -173,9 +175,11 @@ export function FamilySizePanel({
               </li>
             )}
           </ul>
-          {gorunen.length > MAX_SATIR && (
+          {(sonuc.toplam > gorunen.length || sonuc.capSuzuldu) && (
             <p className="mt-2 text-xs text-steel-500">
-              {gorunen.length} ölçüden ilk {MAX_SATIR} tanesi gösteriliyor — aramayla daraltın.
+              {sonuc.toplam > gorunen.length &&
+                `${sonuc.toplam} ölçüden ilk ${gorunen.length} tanesi gösteriliyor — aramayla daraltın. `}
+              {sonuc.capSuzuldu && "Çap eşleşmesi gösteriliyor; uzunluk için 8x40 gibi yazın."}
             </p>
           )}
         </>
@@ -199,26 +203,19 @@ function SizeRow({
   const [qty, setQty] = useState(1);
 
   return (
-    <li className="flex items-center gap-3 bg-white px-3 py-2">
+    <li className="flex items-center gap-2 bg-white px-3 py-2">
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium break-words text-steel-900" title={variant.description}>
           {etiket}
         </p>
         <p className="font-mono text-xs text-steel-500">{variant.code}</p>
       </div>
-      <input
-        type="number"
-        min={1}
-        value={qty}
-        onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))}
-        className="h-9 w-20 shrink-0 rounded-md border border-steel-200 text-center text-sm text-steel-900 focus:border-steel-500 focus:outline-none"
-        aria-label={`${variant.code} adet`}
-      />
+      <QtyInput value={qty} onChange={setQty} ariaLabel={`${variant.code} adet`} />
       <button
         type="button"
         onClick={() => onAdd(qty)}
         className={cn(
-          "flex h-9 shrink-0 items-center gap-1.5 rounded-md px-3 text-sm font-medium transition-colors",
+          "flex h-9 shrink-0 items-center gap-1.5 rounded-md px-2.5 text-sm font-medium transition-colors",
           added
             ? "border border-status-answered/40 bg-status-answered/10 text-status-answered"
             : "bg-steel-950 text-steel-50 hover:bg-steel-800",

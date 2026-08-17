@@ -1,11 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ListPlus, Loader2, Mail, Zap } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ListChecks, ListPlus, Loader2, Mail, Zap } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { CustomerInfoFields, inputClass } from "@/components/quote/CustomerInfoFields";
-import { FamilyGrid } from "@/components/quote/FamilyGrid";
+import { FamilyList } from "@/components/quote/FamilyList";
 import { FamilySizePanel } from "@/components/quote/FamilySizePanel";
 import { QuoteCart } from "@/components/quote/QuoteCart";
 import { QuoteSuccess } from "@/components/quote/QuoteSuccess";
@@ -64,15 +64,6 @@ export function QuoteBuilder({
     cart.items.map((i) => i.code).filter((c): c is string => Boolean(c)),
   );
   const searching = query.trim().length >= 2;
-
-  // Aile seçilince (ürün detayından ?urun= ile gelindiğinde de) ölçü paneline in
-  const seciliSku = secili?.sku ?? null;
-  useEffect(() => {
-    if (!seciliSku) return;
-    document
-      .getElementById("olcu-paneli")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [seciliSku]);
 
   function ekle(v: VariantIndexItem, qty = 1) {
     if (cart.items.length >= MAX_LIST_ITEMS && !addedCodes.has(v.code)) {
@@ -144,8 +135,8 @@ export function QuoteBuilder({
 
   return (
     <div className="grid gap-8 lg:grid-cols-[3fr_2fr] lg:items-start">
-      {/* Sol: arama + fotoğraflı ızgara + ölçü paneli.
-          min-w-0: ızgara sütunu içeriğin doğal genişliğine büyümesin (uzun ürün
+      {/* Sol: arama + ürün listesi + serbest metin.
+          min-w-0: sütun içeriğin doğal genişliğine büyümesin (uzun ürün
           açıklamaları mobilde yatay kaydırma yaratıyordu) */}
       <div className="min-w-0">
         <VariantPicker
@@ -156,29 +147,21 @@ export function QuoteBuilder({
           addedCodes={addedCodes}
         />
 
+        {/* Mobilde ölçü paneli açıkken ürün listesi gizlenir (panel sağ sütunda,
+            yani tek sütunlu düzende listenin altında kalıyor) */}
         {!searching && (
-          <>
-            {/* Mobilde seçim yapılınca ızgara gizlenir — panel 54 kartın altında kalmasın */}
-            <div className={cn("mt-6", secili && "hidden lg:block")}>
-              <FamilyGrid families={families} selectedSku={secili?.sku ?? null} onSelect={aileSec} />
-            </div>
-
-            {secili && (
-              <FamilySizePanel
-                key={secili.sku} // aile değişince filtreler sıfırdan kurulsun
-                family={secili}
-                index={index}
-                addedCodes={addedCodes}
-                onAdd={ekle}
-                onClose={() => setSecili(null)}
-                initialQuality={initialQuality}
-              />
-            )}
-          </>
+          <div className={cn("mt-6", secili && "hidden lg:block")}>
+            <FamilyList families={families} selectedSku={secili?.sku ?? null} onSelect={aileSec} />
+          </div>
         )}
 
         {/* Katalogda bulunamayan ihtiyaç — serbest metin kalemi */}
-        <div className="mt-6 rounded-lg border border-steel-200 bg-steel-50 p-4">
+        <div
+          className={cn(
+            "mt-6 rounded-lg border border-steel-200 bg-steel-50 p-4",
+            secili && "hidden lg:block",
+          )}
+        >
           <div className="flex gap-2">
             <input
               type="text"
@@ -219,8 +202,39 @@ export function QuoteBuilder({
         )}
       </div>
 
-      {/* Sağ: liste + müşteri bilgileri (masaüstünde yapışkan) */}
-      <div id="teklif-formu" className="min-w-0 scroll-mt-24 lg:sticky lg:top-24">
+      {/* Sağ: ölçü paneli (seçiliyken en üstte) + liste + müşteri bilgileri.
+          Masaüstünde yapışkan ve kendi içinde kayar — sayfa hiç sıçramaz. */}
+      <div
+        id="teklif-formu"
+        className="min-w-0 space-y-6 scroll-mt-24 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1"
+      >
+        {/* Ölçü paneli açıkken liste aşağıda kalıyor — tek dokunuşla öne getir */}
+        {secili && cart.items.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setSecili(null)}
+            className="flex w-full items-center justify-between rounded-lg border border-steel-300 bg-white px-4 py-2.5 text-sm font-medium text-steel-800 shadow-card transition-colors hover:border-steel-500"
+          >
+            <span className="flex items-center gap-2">
+              <ListChecks className="size-4 text-signal" aria-hidden />
+              Listem ({cart.items.length} kalem)
+            </span>
+            <span className="text-steel-500">göster</span>
+          </button>
+        )}
+
+        {secili && (
+          <FamilySizePanel
+            key={secili.sku} // aile değişince filtreler sıfırdan kurulsun
+            family={secili}
+            index={index}
+            addedCodes={addedCodes}
+            onAdd={ekle}
+            onClose={() => setSecili(null)}
+            initialQuality={initialQuality}
+          />
+        )}
+
         <QuoteCart
           items={cart.items}
           onQty={cart.setQty}
@@ -232,7 +246,7 @@ export function QuoteBuilder({
         <form
           onSubmit={onSubmit}
           noValidate
-          className="mt-6 space-y-5 rounded-lg border border-steel-200 bg-white p-5 shadow-card"
+          className="space-y-5 rounded-lg border border-steel-200 bg-white p-5 shadow-card"
         >
           <h2 className="font-display text-lg font-semibold text-steel-900">İletişim Bilgileri</h2>
           <CustomerInfoFields register={register} errors={errors} />

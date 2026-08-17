@@ -4,12 +4,14 @@ import { Check, Loader2, Plus, Search, X } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { ProductImage } from "@/components/catalog/ProductImage";
 import type { VariantIndex } from "@/components/quote/useVariantIndex";
-import { searchVariants, type VariantIndexItem } from "@/lib/variant-search-client";
+import { filtreleVaryantlar } from "@/lib/varyant-filtre";
+import { searchVariants, yedekIndeks, type VariantIndexItem } from "@/lib/variant-search-client";
 
 /**
- * Teklif oluşturucunun arama kutusu — tam katalog (~6.750 ölçü varyantı)
- * DIN kodu, ölçü ve açıklamayla aranır. DIN kodunu bilen müşteri ızgaraya
- * hiç inmeden kalemini ekler. İndeks useVariantIndex ile paylaşılır.
+ * Teklif oluşturucunun arama kutusu — tam katalog (~6.750 ölçü varyantı).
+ * Yazılan her kelime birebir aranır, sonuç kademeli daralır:
+ * "din 933" → yalnız DIN 933, ardından "8" → yalnız 8'likler.
+ * Hiç eşleşme çıkmazsa yazım hatası toleranslı yedek aramaya düşülür.
  */
 export function VariantPicker({
   query,
@@ -25,14 +27,28 @@ export function VariantPicker({
   /** Sepetteki kodlar — satırda "eklendi" durumu gösterilir */
   addedCodes: Set<string>;
 }) {
-  const { mini, ensure, loading, error } = index;
+  const { items, ensure, loading, error } = index;
   const searching = query.trim().length >= 2;
 
-  // İndeks hazır olunca sonuçlar doğrudan türetilir — ayrı state tutulmaz
-  const results = useMemo<VariantIndexItem[]>(
-    () => (searching && mini ? searchVariants(mini, query.trim()) : []),
-    [searching, mini, query],
+  const birincil = useMemo(
+    () =>
+      searching && items
+        ? filtreleVaryantlar(items, query)
+        : { items: [], capSuzuldu: false, toplam: 0 },
+    [searching, items, query],
   );
+
+  // Yalnız birebir eşleşme yoksa: yazım hatası toleranslı arama
+  const yedek = useMemo(
+    () =>
+      searching && items && birincil.toplam === 0
+        ? searchVariants(yedekIndeks(items), query.trim())
+        : [],
+    [searching, items, birincil.toplam, query],
+  );
+
+  const results: VariantIndexItem[] = birincil.toplam > 0 ? birincil.items : yedek;
+  const yedekten = birincil.toplam === 0 && yedek.length > 0;
 
   // Yazmaya başlandığında indeks arka planda yüklenir (odaklanma da tetikler)
   useEffect(() => {
@@ -51,7 +67,7 @@ export function VariantPicker({
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
           onFocus={() => void ensure()}
-          placeholder="DIN kodu, ölçü veya açıklama yazın… (örn. DIN 933 M8x40 A2)"
+          placeholder="DIN kodu, ölçü veya açıklama yazın… (örn. 933 8)"
           aria-label="Ürün ara"
           className="h-13 w-full rounded-lg border border-steel-200 bg-white pr-12 pl-12 text-[15px] text-steel-900 shadow-card transition-colors placeholder:text-steel-400 focus:border-steel-500 focus:outline-none"
         />
@@ -79,12 +95,26 @@ export function VariantPicker({
       {searching && !error && (
         <div className="mt-4">
           <p className="text-sm text-steel-500">
-            <strong className="text-steel-900">{results.length}</strong> sonuç
-            {results.length === 0 && !loading
-              ? " — farklı bir yazımla deneyin ya da aşağıdaki ürünlerden seçin"
-              : results.length >= 50
-                ? " gösteriliyor — ölçü ekleyerek daraltın"
-                : ""}
+            {yedekten ? (
+              <>
+                Tam eşleşme yok — <strong className="text-steel-900">benzer {results.length}</strong>{" "}
+                sonuç
+              </>
+            ) : (
+              <>
+                <strong className="text-steel-900">{birincil.toplam}</strong> sonuç
+                {birincil.toplam === 0 && !loading
+                  ? " — farklı bir yazımla deneyin ya da aşağıdaki listeden seçin"
+                  : birincil.toplam > results.length
+                    ? ` — ilk ${results.length} tanesi gösteriliyor, ölçü ekleyerek daraltın (örn. 933 8)`
+                    : ""}
+              </>
+            )}
+            {birincil.capSuzuldu && (
+              <span className="ml-1 text-steel-400">
+                · çap eşleşmesi gösteriliyor; uzunluk için ölçüyü birlikte yazın (örn. 8x40)
+              </span>
+            )}
           </p>
           <ul className="mt-3 divide-y divide-steel-100 rounded-lg border border-steel-200 bg-white shadow-card">
             {results.map((v) => {
