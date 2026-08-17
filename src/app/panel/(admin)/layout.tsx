@@ -6,6 +6,7 @@ import {
   Inbox,
   LayoutDashboard,
   Package,
+  TrendingUp,
   Users,
 } from "lucide-react";
 import { LogoutButton } from "@/components/panel/LogoutButton";
@@ -17,6 +18,7 @@ export const metadata = { robots: { index: false, follow: false } };
 const NAV = [
   { href: "/panel", label: "Genel Bakış", icon: LayoutDashboard },
   { href: "/panel/teklifler", label: "Teklifler", icon: Inbox },
+  { href: "/panel/raporlar", label: "Raporlar", icon: TrendingUp },
   { href: "/panel/musteriler", label: "Müşteriler", icon: Users },
   { href: "/panel/urunler", label: "Ürünler", icon: Package },
   { href: "/panel/kategoriler", label: "Kategoriler", icon: FolderTree },

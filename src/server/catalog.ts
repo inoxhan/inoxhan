@@ -166,3 +166,45 @@ export async function getVariantIndexData() {
 }
 
 export type VariantIndexItem = Awaited<ReturnType<typeof getVariantIndexData>>[number];
+
+/**
+ * Teklif oluşturucunun fotoğraflı ürün ızgarası — 54 aile.
+ * Ölçüler (Variant) ızgaradan seçilen ailenin altında, istemcideki varyant
+ * indeksinden süzülerek gösterilir; burada yalnız aile kartı + ölçü sayısı döner.
+ */
+export interface QuoteFamily {
+  sku: string;
+  name: string;
+  slug: string;
+  categorySlug: string;
+  categoryName: string;
+  image: string | null;
+  variantCount: number;
+}
+
+export async function getQuoteBuilderFamilies(): Promise<QuoteFamily[]> {
+  const products = await db.product.findMany({
+    where: { isActive: true },
+    select: {
+      sku: true,
+      name: true,
+      slug: true,
+      category: { select: { slug: true, name: true } },
+      images: { where: { isMain: true }, take: 1, select: { basePath: true } },
+      drawings: { where: { kind: "cizim" }, take: 1, select: { basePath: true } },
+      _count: { select: { variants: { where: { isActive: true } } } },
+    },
+    orderBy: [{ category: { order: "asc" } }, { name: "asc" }],
+  });
+
+  return products.map((p) => ({
+    sku: p.sku,
+    name: p.name,
+    slug: p.slug,
+    categorySlug: p.category.slug,
+    categoryName: p.category.name,
+    // Fotoğraf yoksa teknik çizim kart görseli olarak iş görür (varyant indeksiyle aynı ilke)
+    image: p.images[0]?.basePath ?? p.drawings[0]?.basePath ?? null,
+    variantCount: p._count.variants,
+  }));
+}

@@ -2,9 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Mail, MapPin, MessageCircle, Paperclip, Phone } from "lucide-react";
 import { ElapsedTimer } from "@/components/panel/ElapsedTimer";
+import { OutcomeBadge } from "@/components/panel/OutcomeBadge";
 import { QuoteStatusActions } from "@/components/panel/QuoteStatusActions";
 import { StatusBadge } from "@/components/panel/StatusBadge";
+import { LOST_AFTER_HOURS } from "@/lib/constants";
 import { formatPhoneTr } from "@/lib/phone";
+import { OUTCOME_HINTS, OUTCOME_LABELS, outcomeDeadline, quoteOutcome } from "@/lib/quote-outcome";
 import { db } from "@/server/db";
 
 export default async function TeklifDetayPage({
@@ -26,8 +29,10 @@ export default async function TeklifDetayPage({
   });
   if (!quote) notFound();
 
-  const open = quote.status !== "CEVAPLANAN";
+  const open = quote.status !== "CEVAPLANAN" && quote.status !== "SIPARIS";
   const waPhone = quote.customer.phone.replace("+", "");
+  const sonuc = quoteOutcome(quote);
+  const kapanis = outcomeDeadline(quote);
 
   return (
     <div className="max-w-3xl">
@@ -45,6 +50,7 @@ export default async function TeklifDetayPage({
         </h1>
         <div className="flex items-center gap-3">
           <StatusBadge status={quote.status} />
+          <OutcomeBadge quote={quote} />
           <ElapsedTimer
             createdAt={quote.createdAt.toISOString()}
             respondedAt={quote.respondedAt?.toISOString() ?? null}
@@ -194,8 +200,16 @@ export default async function TeklifDetayPage({
         <div className="mt-3">
           <QuoteStatusActions quoteId={quote.id} current={quote.status} />
         </div>
+
+        <p className="mt-4 rounded-md bg-steel-50 px-4 py-3 text-sm text-steel-600">
+          <strong className="text-steel-900">Sonuç: {OUTCOME_LABELS[sonuc]}</strong> —{" "}
+          {OUTCOME_HINTS[sonuc]}
+          {kapanis && ` · ${kapanis.toLocaleString("tr-TR")} tarihinde kendiliğinden kapanır`}
+        </p>
         <p className="mt-3 text-xs text-steel-400">
-          &quot;Cevaplanan&quot; işaretlendiğinde yanıt süresi kaydedilir ve istatistiklere işlenir.
+          &quot;Cevaplanan&quot; işaretlendiğinde yanıt süresi kaydedilir. Sipariş oluşursa
+          &quot;Sipariş Oldu&quot; işaretleyin; {LOST_AFTER_HOURS} saat içinde işaretlenmeyen
+          cevaplanmış talepler raporda &quot;Fiyat tutmadı&quot; olarak sayılır.
         </p>
       </section>
     </div>

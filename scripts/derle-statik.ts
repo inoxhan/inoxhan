@@ -39,9 +39,9 @@ const CIKARILAN_DIZINLER = [
   "src/app/panel",
   "src/app/api",
   "src/app/katalog-baski",
-  // İki kanallı teklif sistemi (sepet + dosya) sunucu ister — statikte eski tek form kalır
+  // Eski /teklif/liste rotası yalnız yönlendirme yapar; statik dışa aktarım
+  // çalışma anı yönlendirmesi üretemez (teklif oluşturucu zaten /teklif'te)
   "src/app/teklif/liste",
-  "src/app/teklif/dosya",
 ];
 
 /** Statik dışa aktarımın kabul etmediği segment ayarları — geçici kapatılır. */

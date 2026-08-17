@@ -9,11 +9,6 @@ import type { NextConfig } from "next";
 const statik = process.env.STATIC_EXPORT === "1";
 
 const nextConfig: NextConfig = {
-  // Dosyalı teklif kanalının dev/disk fallback'i FormData ile gelir (10 MB dosya
-  // + multipart ek yükü). Vercel'de dosyalar istemciden doğrudan Blob'a yüklenir.
-  experimental: {
-    serverActions: { bodySizeLimit: "12mb" },
-  },
   ...(statik && {
     output: "export" as const,
     basePath: process.env.NEXT_PUBLIC_BASE_PATH ?? "",
@@ -22,6 +17,9 @@ const nextConfig: NextConfig = {
     turbopack: {
       resolveAlias: {
         "@/server/actions/quote": "@/server/actions/quote-static",
+        // Teklif oluşturucu sunucu aksiyonu kullanır; statik dışa aktarımda
+        // sunucu aksiyonu bulunamaz — boyanmayan bir karşılıkla takas edilir.
+        "@/components/quote/QuoteBuilder": "@/components/quote/QuoteBuilder-static",
       },
     },
   }),

@@ -84,17 +84,26 @@ export const SHOWREEL_CLIPS = [
   { src: "media/video/03-teklif", alt: "Tek bir paslanmaz cıvatanın yakın çekimi" },
 ] as const;
 
-export const QUOTE_STATUSES = ["YENI", "BEKLEYEN", "CEVAPLANAN"] as const;
+export const QUOTE_STATUSES = ["YENI", "BEKLEYEN", "CEVAPLANAN", "SIPARIS"] as const;
 export type QuoteStatus = (typeof QUOTE_STATUSES)[number];
 
 export const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
   YENI: "Yeni",
   BEKLEYEN: "Bekleyen",
   CEVAPLANAN: "Cevaplanan",
+  SIPARIS: "Sipariş",
 };
 
 /** SLA eşikleri (dakika) — panelde renk eskalasyonu. Müşteriye verilen 15-30 dk vaadiyle aynı. */
 export const SLA = { warnAfterMin: 15, breachAfterMin: 30 } as const;
+
+/**
+ * Teklif sonucu otomatik kapanma eşiği: fiyat verildikten sonra bu süre içinde
+ * sipariş oluşmazsa talep "Fiyat tutmadı" sayılır (elle işaretleme yok, sistem
+ * kendiliğinden ilerler). Türetme mantığı: src/lib/quote-outcome.ts
+ */
+export const LOST_AFTER_HOURS = 48;
+export const LOST_REASON = "Fiyat tutmadı";
 
 export const QUOTE_UNITS = ["adet", "kutu", "paket", "metre", "kg"] as const;
 
@@ -125,5 +134,5 @@ export const EVENT_TYPES = [
 ] as const;
 export type EventType = (typeof EVENT_TYPES)[number];
 
-/** Teklif kaynakları — hangi noktadan forma gelindi. liste/dosya: iki kanallı sistem. */
-export const QUOTE_SOURCES = ["form", "product", "hero", "floating", "liste", "dosya"] as const;
+/** Teklif kaynakları — hangi noktadan forma gelindi. "liste": görselli teklif oluşturucu. */
+export const QUOTE_SOURCES = ["form", "product", "hero", "floating", "liste"] as const;

@@ -5,6 +5,7 @@ const styles: Record<QuoteStatus, string> = {
   YENI: "bg-status-new/10 text-status-new border-status-new/30",
   BEKLEYEN: "bg-status-pending/10 text-status-pending border-status-pending/30",
   CEVAPLANAN: "bg-status-answered/10 text-status-answered border-status-answered/30",
+  SIPARIS: "bg-steel-950 text-steel-50 border-steel-950",
 };
 
 export function StatusBadge({ status }: { status: string }) {

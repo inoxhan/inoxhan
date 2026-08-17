@@ -1,20 +1,27 @@
 import Link from "next/link";
-import { AlertTriangle, Clock, Inbox, PackageCheck } from "lucide-react";
+import { AlertTriangle, BarChart3, Clock, Inbox, PackageCheck } from "lucide-react";
 import { AutoRefresh } from "@/components/panel/AutoRefresh";
 import { ElapsedTimer } from "@/components/panel/ElapsedTimer";
 import { StatusBadge } from "@/components/panel/StatusBadge";
-import { SLA } from "@/lib/constants";
+import { LOST_AFTER_HOURS, SLA } from "@/lib/constants";
 import { db } from "@/server/db";
 
 export default async function PanelDashboard() {
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
+  const ayBasi = new Date();
+  ayBasi.setDate(1);
+  ayBasi.setHours(0, 0, 0, 0);
   const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const warnBefore = new Date(Date.now() - SLA.warnAfterMin * 60 * 1000);
+  // 48 saati aşan cevapsız talepler "yanıtsız kapandı" sayılır — açık listede birikmesinler
+  const kayipEsigi = new Date(Date.now() - LOST_AFTER_HOURS * 60 * 60 * 1000);
 
-  const [todayCount, openCount, answered30d, urgent] = await Promise.all([
+  const [todayCount, openCount, answered30d, urgent, ayTalep, aySiparis] = await Promise.all([
     db.quoteRequest.count({ where: { createdAt: { gte: startOfDay } } }),
-    db.quoteRequest.count({ where: { status: { in: ["YENI", "BEKLEYEN"] } } }),
+    db.quoteRequest.count({
+      where: { status: { in: ["YENI", "BEKLEYEN"] }, createdAt: { gt: kayipEsigi } },
+    }),
     db.quoteRequest.findMany({
       where: { status: "CEVAPLANAN", respondedAt: { not: null }, createdAt: { gte: monthAgo } },
       select: { createdAt: true, respondedAt: true },
@@ -25,6 +32,8 @@ export default async function PanelDashboard() {
       orderBy: { createdAt: "asc" },
       take: 10,
     }),
+    db.quoteRequest.count({ where: { createdAt: { gte: ayBasi } } }),
+    db.quoteRequest.count({ where: { createdAt: { gte: ayBasi }, orderedAt: { not: null } } }),
   ]);
 
   const avgResponseMin =
@@ -45,6 +54,12 @@ export default async function PanelDashboard() {
       value: avgResponseMin === null ? "—" : `${avgResponseMin} dk`,
       icon: PackageCheck,
     },
+    {
+      label: `Bu ay ${ayTalep} talep · ${aySiparis} sipariş`,
+      value: ayTalep > 0 ? `%${Math.round((aySiparis / ayTalep) * 100)}` : "—",
+      icon: BarChart3,
+      href: "/panel/raporlar",
+    },
   ];
 
   return (
@@ -52,14 +67,30 @@ export default async function PanelDashboard() {
       <AutoRefresh />
       <h1 className="font-display text-2xl font-bold text-steel-900">Genel Bakış</h1>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        {stats.map((s) => (
-          <div key={s.label} className="rounded-lg border border-steel-200 bg-white p-5 shadow-card">
-            <s.icon className="size-5 text-steel-400" aria-hidden />
-            <p className="font-display mt-3 text-3xl font-bold text-steel-900">{s.value}</p>
-            <p className="mt-1 text-sm text-steel-500">{s.label}</p>
-          </div>
-        ))}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {stats.map((s) => {
+          const govde = (
+            <>
+              <s.icon className="size-5 text-steel-400" aria-hidden />
+              <p className="font-display mt-3 text-3xl font-bold text-steel-900">{s.value}</p>
+              <p className="mt-1 text-sm text-steel-500">{s.label}</p>
+            </>
+          );
+          const sinif = "rounded-lg border border-steel-200 bg-white p-5 shadow-card";
+          return s.href ? (
+            <Link
+              key={s.label}
+              href={s.href}
+              className={`${sinif} block transition-colors hover:border-steel-400`}
+            >
+              {govde}
+            </Link>
+          ) : (
+            <div key={s.label} className={sinif}>
+              {govde}
+            </div>
+          );
+        })}
       </div>
 
       <section className="mt-10">

@@ -142,18 +142,20 @@ model Customer {
 
 model QuoteRequest {
   id             String      @id @default(cuid())
-  status         String      @default("YENI") // YENI | BEKLEYEN | CEVAPLANAN (zod korumalı)
+  status         String      @default("YENI") // YENI | BEKLEYEN | CEVAPLANAN | SIPARIS (zod korumalı)
   note           String?
   attachmentPath String? // "bana bu ürün lazım" fotoğrafı (özel depolama)
-  source         String      @default("form") // form | product | hero | floating | liste | dosya
+  source         String      @default("form") // form | product | hero | floating | liste
   customerId     String
   customer       Customer    @relation(fields: [customerId], references: [id])
   items          QuoteItem[]
   attachments    QuoteAttachment[]
   createdAt      DateTime    @default(now()) // geçen süre sayacının kaynağı
-  respondedAt    DateTime?
+  respondedAt    DateTime? // fiyat verildiği an — 48 saatlik kayıp sayacı buradan başlar
+  orderedAt      DateTime? // sipariş damgası; boşsa ve 48 saat geçtiyse sonuç "Fiyat tutmadı"
 
   @@index([status, createdAt])
+  @@index([createdAt]) // aylık rapor aralık sorgusu ([status, createdAt] öneki uymaz)
 }
 
 model QuoteItem {
@@ -169,6 +171,11 @@ model QuoteItem {
   quoteRequest   QuoteRequest @relation(fields: [quoteRequestId], references: [id], onDelete: Cascade)
   product        Product?     @relation(fields: [productId], references: [id])
   variant        Variant?     @relation(fields: [variantId], references: [id])
+
+  // Aylık rapor kalem birleştirmeleri bu üç yoldan geçer
+  @@index([quoteRequestId])
+  @@index([productId])
+  @@index([variantId])
 }
 
 /// Dosya kanalının (1-3 dosya) ekleri. Eski tek dosyalı akışın

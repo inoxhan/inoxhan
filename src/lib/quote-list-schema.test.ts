@@ -66,6 +66,15 @@ describe("quoteListSchema items", () => {
     expect(r.success).toBe(false);
   });
 
+  it("kaldırılan dosya kanalını reddeder", () => {
+    const r = quoteListSchema.safeParse({
+      ...taban,
+      source: "dosya",
+      items: [{ code: "084202 005", freeText: "", quantity: 1, unit: "adet", quality: "" }],
+    });
+    expect(r.success).toBe(false);
+  });
+
   it("dizge adet değerini sayıya çevirir (form girdisi)", () => {
     const r = quoteListSchema.safeParse({
       ...taban,

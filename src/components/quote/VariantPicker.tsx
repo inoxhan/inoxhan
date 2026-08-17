@@ -1,74 +1,43 @@
 "use client";
 
 import { Check, Loader2, Plus, Search, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import type MiniSearch from "minisearch";
+import { useEffect, useMemo } from "react";
 import { ProductImage } from "@/components/catalog/ProductImage";
-import {
-  buildVariantIndex,
-  searchVariants,
-  type VariantIndexItem,
-} from "@/lib/variant-search-client";
+import type { VariantIndex } from "@/components/quote/useVariantIndex";
+import { searchVariants, type VariantIndexItem } from "@/lib/variant-search-client";
 
 /**
- * Hızlı teklif seçicisi — tam katalog (~6.750 ölçü varyantı) DIN kodu ve
- * açıklamayla aranır, kalemler tek dokunuşla listeye eklenir.
- * İndeks ilk odaklanmada /api/variant-index'ten tembel yüklenir
- * (CatalogSearch ile aynı desen).
+ * Teklif oluşturucunun arama kutusu — tam katalog (~6.750 ölçü varyantı)
+ * DIN kodu, ölçü ve açıklamayla aranır. DIN kodunu bilen müşteri ızgaraya
+ * hiç inmeden kalemini ekler. İndeks useVariantIndex ile paylaşılır.
  */
 export function VariantPicker({
+  query,
+  onQueryChange,
+  index,
   onAdd,
   addedCodes,
-  initialQuery = "",
 }: {
+  query: string;
+  onQueryChange: (q: string) => void;
+  index: VariantIndex;
   onAdd: (v: VariantIndexItem) => void;
   /** Sepetteki kodlar — satırda "eklendi" durumu gösterilir */
   addedCodes: Set<string>;
-  initialQuery?: string;
 }) {
-  const [query, setQuery] = useState(initialQuery);
-  const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<VariantIndexItem[]>([]);
-  const miniRef = useRef<MiniSearch<VariantIndexItem> | null>(null);
-  const loadPromise = useRef<Promise<void> | null>(null);
-
-  function ensureIndex() {
-    if (miniRef.current || loadPromise.current) return loadPromise.current;
-    setLoading(true);
-    loadPromise.current = fetch("/api/variant-index")
-      .then((r) => r.json())
-      .then((items: VariantIndexItem[]) => {
-        miniRef.current = buildVariantIndex(items);
-      })
-      .finally(() => setLoading(false));
-    return loadPromise.current;
-  }
-
-  useEffect(() => {
-    const q = query.trim();
-    if (q.length < 2) {
-      setResults([]);
-      return;
-    }
-    let cancelled = false;
-    Promise.resolve(ensureIndex()).then(() => {
-      if (!cancelled && miniRef.current) {
-        setResults(searchVariants(miniRef.current, q));
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
-
-  // Ürün detayından ?din= ile gelindiyse indeksi hemen ısıt
-  useEffect(() => {
-    if (initialQuery) void ensureIndex();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+  const { mini, ensure, loading, error } = index;
   const searching = query.trim().length >= 2;
+
+  // İndeks hazır olunca sonuçlar doğrudan türetilir — ayrı state tutulmaz
+  const results = useMemo<VariantIndexItem[]>(
+    () => (searching && mini ? searchVariants(mini, query.trim()) : []),
+    [searching, mini, query],
+  );
+
+  // Yazmaya başlandığında indeks arka planda yüklenir (odaklanma da tetikler)
+  useEffect(() => {
+    if (searching) void ensure();
+  }, [searching, ensure]);
 
   return (
     <div>
@@ -80,8 +49,8 @@ export function VariantPicker({
         <input
           type="search"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={ensureIndex}
+          onChange={(e) => onQueryChange(e.target.value)}
+          onFocus={() => void ensure()}
           placeholder="DIN kodu, ölçü veya açıklama yazın… (örn. DIN 933 M8x40 A2)"
           aria-label="Ürün ara"
           className="h-13 w-full rounded-lg border border-steel-200 bg-white pr-12 pl-12 text-[15px] text-steel-900 shadow-card transition-colors placeholder:text-steel-400 focus:border-steel-500 focus:outline-none"
@@ -92,7 +61,7 @@ export function VariantPicker({
         {!loading && query && (
           <button
             type="button"
-            onClick={() => setQuery("")}
+            onClick={() => onQueryChange("")}
             className="absolute top-1/2 right-4 -translate-y-1/2 text-steel-400 hover:text-steel-700"
             aria-label="Aramayı temizle"
           >
@@ -101,12 +70,18 @@ export function VariantPicker({
         )}
       </div>
 
-      {searching ? (
+      {error && searching && (
+        <p className="mt-3 rounded-md border border-status-overdue/30 bg-status-overdue/5 px-4 py-3 text-sm text-status-overdue">
+          {error}
+        </p>
+      )}
+
+      {searching && !error && (
         <div className="mt-4">
           <p className="text-sm text-steel-500">
             <strong className="text-steel-900">{results.length}</strong> sonuç
             {results.length === 0 && !loading
-              ? " — farklı bir yazımla deneyin ya da aşağıdan serbest metinle ekleyin"
+              ? " — farklı bir yazımla deneyin ya da aşağıdaki ürünlerden seçin"
               : results.length >= 50
                 ? " gösteriliyor — ölçü ekleyerek daraltın"
                 : ""}
@@ -155,10 +130,6 @@ export function VariantPicker({
             })}
           </ul>
         </div>
-      ) : (
-        <p className="mt-3 text-sm text-steel-400">
-          Tüm katalog aranabilir — DIN normu, ölçü (M8x40) veya ürün adıyla arayın.
-        </p>
       )}
     </div>
   );

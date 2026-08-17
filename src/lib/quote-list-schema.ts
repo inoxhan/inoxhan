@@ -3,12 +3,11 @@ import { normalizePhoneTr } from "@/lib/phone";
 import { QUALITY_OPTIONS, QUOTE_UNITS } from "@/lib/constants";
 
 /**
- * İki kanallı teklif sisteminin ortak şeması — istemcide (RHF) ve sunucuda
+ * Teklif oluşturucunun ortak şeması — istemcide (RHF) ve sunucuda
  * (submitQuoteList) AYNI şema kullanılır; quote-schema.ts ile aynı ilke.
  *
- * Kanal "liste": items ürün varyantı kodlarıyla dolu gelir.
- * Kanal "dosya": items kısa açıklamalı tek serbest kalem olabilir; en az bir
- * dosya zorunluluğu form katmanında denetlenir (dosyalar ayrı yüklenir).
+ * items, ızgaradan/aramadan seçilen varyant kodlarıyla gelir; katalogda
+ * bulunamayan ihtiyaç serbest metin kalemi olarak taşınır.
  */
 
 /** Sepet kalemi — varyant kodu YA DA serbest metin taşır. */
@@ -68,7 +67,7 @@ export const quoteCustomerSchema = z
 export const quoteListSchema = z
   .object({
     ...musteriAlanlari,
-    source: z.enum(["liste", "dosya"]),
+    source: z.enum(["liste"]),
     items: z
       .array(quoteListItemSchema)
       .min(1, "Listeye en az bir ürün ekleyin")

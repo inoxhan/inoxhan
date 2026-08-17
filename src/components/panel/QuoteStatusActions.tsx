@@ -10,6 +10,7 @@ const activeStyle: Record<QuoteStatus, string> = {
   YENI: "border-status-new bg-status-new text-white",
   BEKLEYEN: "border-status-pending bg-status-pending text-white",
   CEVAPLANAN: "border-status-answered bg-status-answered text-white",
+  SIPARIS: "border-steel-950 bg-steel-950 text-steel-50",
 };
 
 export function QuoteStatusActions({
@@ -36,7 +37,7 @@ export function QuoteStatusActions({
               : "border-steel-200 bg-white text-steel-600 hover:border-steel-400",
           )}
         >
-          {QUOTE_STATUS_LABELS[s]}
+          {s === "SIPARIS" ? "Sipariş Oldu" : QUOTE_STATUS_LABELS[s]}
         </button>
       ))}
       {pending && <Loader2 className="size-4 animate-spin text-steel-400" />}

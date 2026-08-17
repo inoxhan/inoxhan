@@ -9,6 +9,7 @@ const EVENT_LABELS: Record<string, string> = {
   form_abandon: "Form terk",
   whatsapp_click: "WhatsApp'a geçiş",
   product_quote_requested: "Üründen teklif talebi",
+  quote_list_submitted: "Liste gönderimi",
   category_view: "Kategori görüntülenme",
   search_query: "Arama",
 };

@@ -17,6 +17,7 @@
     "import:excel": "tsx scripts/import-excel.ts",
     "import:varyantlar": "tsx scripts/import-varyantlar.ts",
     "import:sample": "tsx scripts/make-sample-import.ts",
+    "ornek:teklif": "tsx scripts/ornek-teklif-uret.ts",
     "hazirla:logo": "tsx scripts/hazirla-logo.ts",
     "hazirla:hero": "tsx scripts/hazirla-hero.ts",
     "hazirla:medya": "tsx scripts/hazirla-medya.ts",

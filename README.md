@@ -239,18 +239,37 @@ Ayrıntı: `scripts/derle-statik.ts`. Teklif alıcısı `.env` `NOTIFY_EMAIL`
 (boşsa `info@inoxhan.com` gömülür); WhatsApp için `WHATSAPP_NUMBER` doldurup
 yeniden derleyin. Kalıcı çözüm için aşağıdaki VPS bölümü geçerlidir.
 
-## İki kanallı teklif sistemi (sunucu sürümü)
+## Teklif oluşturucu (sunucu sürümü)
 
-- **/teklif/liste** — hızlı teklif (15-30 dk): tam katalog (~6.750 ölçü varyantı,
-  `npm run import:varyantlar -- --file <xlsx>`) DIN kodu/açıklamayla aranır, tik ile
-  sepete eklenir, tek seferde gönderilir. Sepet localStorage'da (`useQuoteCart`).
-- **/teklif/dosya** — fotoğraf/dosya kanalı: 1-3 dosya; Vercel'de tarayıcıdan doğrudan
-  Blob'a yüklenir (`/api/blob-upload`), lokalde `storage/uploads` diskine düşer.
-  Dönüşün listeli taleplerden uzun olabileceği açıkça belirtilir.
+- **/teklif** — tek sayfa: fotoğraflı ürün ızgarası (54 aile, kategori çipleriyle) →
+  karta tıklayınca ızgaranın altında o ailenin ölçüleri açılır (A2/A4 süzgeci, adet) →
+  sağda yapışkan liste → altında iletişim formu. Sayfa hiç değişmez.
+  Kod bilen müşteri üstteki arama kutusundan (~6.750 ölçü varyantı,
+  `npm run import:varyantlar -- --file <xlsx>`) doğrudan ekler.
+  Liste localStorage'da yaşar (`useQuoteCart`), gönderim `submitQuoteList`.
+- Katalogda olmayan ihtiyaç serbest metin satırından eklenir; ürününü hiç bulamayan
+  müşteri `info@inoxhan.com` adresine yazar (fotoğraf/dosya kanalı kaldırıldı).
 - Kayıtlar panelde: teklif kalemleri varyant kodlu, müşteri adresli; vergi no/TC
   teklifte sorulmaz, sipariş aşamasında panel müşteri kartından işlenir.
 - Veritabanı: Neon Postgres (`DATABASE_URL` pooled + `DIRECT_URL`); statik GitHub
-  Pages sürümü bu sistemleri içermez (eski tek formlu akış korunur).
+  Pages sürümü bu sistemi içermez (eski tek formlu akış korunur).
+
+## Teklif sonucu ve aylık rapor
+
+- Sonuç **türetilir, saklanmaz** (`src/lib/quote-outcome.ts`): fiyat verildikten
+  sonra `LOST_AFTER_HOURS` (48) saat içinde "Sipariş Oldu" işaretlenmezse talep
+  **Fiyat tutmadı**; hiç cevaplanmadan aynı süre geçerse **Yanıtsız kapandı** olur.
+  Cron/arka plan işi yoktur, kural her okumada uygulanır.
+- Panelde `Sipariş Oldu` düğmesi `QuoteRequest.orderedAt` damgasını basar; teklif
+  listesinde "Fiyat tutmadı" ve "Yanıtsız" sekmeleri bu kuralın SQL karşılığıdır.
+- **/panel/raporlar?ay=YYYY-MM** — aylık özet, en çok sorulan ürünler (ölçü
+  kırılımlı), sorulmuş ama verilmemiş ürünler, firma dökümü, kategori/grup dağılımı,
+  cevap performansı. Her tablo `/api/panel/rapor?ay=&tablo=` üzerinden CSV
+  (UTF-8 BOM + `;` — Türkçe Excel doğru açar).
+- Agregasyon saf fonksiyonda (`src/lib/report-aggregate.ts`, fixture testli); sorgu
+  `src/server/reports.ts` (ay sınırları TR saatine göre, `RAPOR_LIMIT` 5.000 talep).
+- Rapor sayfasını gerçek veriyle denemek için: `npm run ornek:teklif` (YALNIZ dev
+  veritabanında — örnek müşteri/talep üretir).
 
 ## Sunucuya taşıma (VPS)
 

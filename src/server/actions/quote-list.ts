@@ -7,18 +7,15 @@ import { postQuoteToCrm } from "@/server/crm-webhook";
 import { db } from "@/server/db";
 import { sendQuoteNotification } from "@/server/email";
 import { rateLimit } from "@/server/rate-limit";
-import { saveQuoteAttachment } from "@/server/storage";
 
 export type SubmitQuoteListResult =
   | { ok: true; quoteId: string }
   | { ok: false; message: string };
 
 /**
- * İki kanallı teklif sistemi gönderimi:
- *  - "liste": hızlı seçici sepeti — items varyant kodlarıyla gelir.
- *  - "dosya": fotoğraf/dosya kanalı — ekler ya bu FormData'da ("attachment" alanları,
- *    dev/disk fallback) ya da önceden Vercel Blob'a yüklenmiş pathname listesinde
- *    ("blobPaths" JSON) gelir.
+ * Teklif oluşturucu gönderimi ("liste" kaynağı): ızgaradan/aramadan seçilen
+ * varyant kodları + katalogda bulunamayan ihtiyaçlar için serbest metin kalemleri.
+ * Dosya/fotoğraf kanalı kaldırıldı — ürününü bulamayan müşteri e-posta atar.
  *
  * Not: submitQuote (tek ürün) bilinçli olarak AYRI bırakıldı — statik derleme
  * o modülü quote-static ile takas ediyor (next.config.ts resolveAlias) ve imza
@@ -72,29 +69,6 @@ export async function submitQuoteList(formData: FormData): Promise<SubmitQuoteLi
     : [];
   const variantMap = new Map(variants.map((v) => [v.code, v]));
 
-  // Ekler: önce Blob'a istemciden yüklenmiş pathname'ler, sonra FormData dosyaları
-  const ekYollari: string[] = [];
-  try {
-    const blobPaths: unknown = JSON.parse(String(formData.get("blobPaths") ?? "[]"));
-    if (Array.isArray(blobPaths)) {
-      for (const p of blobPaths.slice(0, 3)) {
-        if (typeof p === "string" && p.startsWith("uploads/")) ekYollari.push(p);
-      }
-    }
-  } catch {
-    // blobPaths bozuksa dosyasız devam — liste kanalında zaten yok
-  }
-  for (const file of formData.getAll("attachment").slice(0, 3)) {
-    if (file instanceof File && file.size > 0) {
-      const saved = await saveQuoteAttachment(file);
-      if (!saved.ok) return { ok: false, message: saved.error };
-      ekYollari.push(saved.relPath);
-    }
-  }
-  if (values.source === "dosya" && ekYollari.length === 0) {
-    return { ok: false, message: "Lütfen en az bir fotoğraf veya dosya ekleyin" };
-  }
-
   // Ad boşsa firma adı müşteri adı olarak kullanılır (Customer.name zorunlu)
   const gorunenAd = values.name?.trim() || values.company?.trim() || "";
 
@@ -135,9 +109,6 @@ export async function submitQuoteList(formData: FormData): Promise<SubmitQuoteLi
           };
         }),
       },
-      attachments: {
-        create: ekYollari.map((p, i) => ({ path: p, order: i })),
-      },
     },
   });
 
@@ -165,7 +136,7 @@ export async function submitQuoteList(formData: FormData): Promise<SubmitQuoteLi
       address: values.address,
       items: etiketler,
       note: values.note || null,
-      hasAttachment: ekYollari.length > 0,
+      hasAttachment: false,
       source: values.source,
     }),
     postQuoteToCrm({
@@ -196,7 +167,6 @@ export async function submitQuoteList(formData: FormData): Promise<SubmitQuoteLi
           source: values.source,
           itemCount: values.items.length,
           codes: etiketler.map((e) => e.sku).filter(Boolean).slice(0, 30),
-          attachments: ekYollari.length,
         }),
       },
     }),
