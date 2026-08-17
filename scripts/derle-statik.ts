@@ -42,6 +42,8 @@ const CIKARILAN_DIZINLER = [
   // Eski /teklif/liste rotası yalnız yönlendirme yapar; statik dışa aktarım
   // çalışma anı yönlendirmesi üretemez (teklif oluşturucu zaten /teklif'te)
   "src/app/teklif/liste",
+  // Yayın kapısı (Basic Auth) sunucu ister; statik dışa aktarım proxy desteklemez
+  "src/proxy.ts",
 ];
 
 /** Statik dışa aktarımın kabul etmediği segment ayarları — geçici kapatılır. */

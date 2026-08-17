@@ -20,6 +20,7 @@
     "ornek:teklif": "tsx scripts/ornek-teklif-uret.ts",
     "smoke:teklif": "tsx scripts/smoke-teklif.ts",
     "hazirla:logo": "tsx scripts/hazirla-logo.ts",
+    "hazirla:kucuk": "tsx scripts/hazirla-kucuk-gorsel.ts",
     "hazirla:hero": "tsx scripts/hazirla-hero.ts",
     "hazirla:medya": "tsx scripts/hazirla-medya.ts",
     "hazirla:video": "tsx scripts/hazirla-video.ts",

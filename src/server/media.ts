@@ -7,6 +7,9 @@ import sharp from "sharp";
  * Seed, panel CRUD ve Faz 5 içe aktarma hattı aynı fonksiyonu kullanır.
  */
 export const IMAGE_VARIANTS = [
+  // xs: liste/sepet küçük görselleri (40-56 px kutu, 2-3× DPR). 480 px'lik "sm"i
+  // 56 px'e sıkıştırmak teklif sayfasında yarım MB gereksiz indirme demekti.
+  { suffix: "xs", width: 160 },
   { suffix: "sm", width: 480 },
   { suffix: "md", width: 960 },
   { suffix: "lg", width: 1600 },

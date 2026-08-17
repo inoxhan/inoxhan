@@ -126,6 +126,7 @@ export function VariantPicker({
                       basePath={v.image}
                       alt=""
                       sizes="48px"
+                      thumb
                       className="size-full object-contain"
                     />
                   </div>

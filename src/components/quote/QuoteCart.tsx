@@ -55,6 +55,7 @@ export function QuoteCart({
                 basePath={item.image}
                 alt=""
                 sizes="40px"
+                thumb
                 className="size-full object-contain"
               />
             </div>

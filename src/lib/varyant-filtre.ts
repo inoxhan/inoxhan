@@ -39,30 +39,51 @@ function regexKacis(s: string): string {
 }
 
 /**
+ * Kelime başına DESENLER bir kez derlenir. 6.750 satırda kelime başına yeni
+ * RegExp kurmak her tuş vuruşunda on binlerce derleme demekti — arama gözle
+ * görülür şekilde takılıyordu.
+ */
+interface KelimeDeseni {
+  kelime: string;
+  eslesme: RegExp;
+  /** Sayı kelimeleri için çap deseni ("8" → /m8(?!\d)/), değilse null */
+  cap: RegExp | null;
+}
+
+export function desenleriKur(kelimeler: string[]): KelimeDeseni[] {
+  return kelimeler.map((k) => {
+    const on = /^\d/.test(k) ? "(?<!\\d)" : "";
+    const arka = /\d$/.test(k) ? "(?!\\d)" : "";
+    return {
+      kelime: k,
+      eslesme: new RegExp(`${on}${regexKacis(k)}${arka}`),
+      cap: /^\d+$/.test(k) ? new RegExp(`m${k}(?!\\d)`) : null,
+    };
+  });
+}
+
+/**
  * Tek kelimenin metinde geçip geçmediği. Rakamla başlayan/biten kelimeler rakam
  * sınırıyla aranır: "8" → "m8x40" (evet), "m18x40" (hayır); "8x40" → "m8x40"
  * (evet), "m18x40" (hayır). Böylece yazdıkça daralma tahmin edilebilir olur.
  */
 export function kelimeEslesir(metin: string, kelime: string): boolean {
-  const on = /^\d/.test(kelime) ? "(?<!\\d)" : "";
-  const arka = /\d$/.test(kelime) ? "(?!\\d)" : "";
-  return new RegExp(`${on}${regexKacis(kelime)}${arka}`).test(metin);
+  return desenleriKur([kelime])[0].eslesme.test(metin);
 }
 
 export function varyantEslesir(v: AranabilirVaryant, kelimeler: string[]): boolean {
-  return kelimeler.every((k) => kelimeEslesir(v.aranabilir, k));
+  return desenleriKur(kelimeler).every((d) => d.eslesme.test(v.aranabilir));
 }
 
 /**
- * Sayı kelimesinin ÇAP olarak geçtiği kaç kez görülüyor: "8" → "m8x40" (evet),
+ * Sayı kelimesinin ÇAP olarak kaç kez geçtiği: "8" → "m8x40" (evet),
  * "m3x8" (hayır). Sektörde "8'lik" demek M8 demektir; bu yüzden çap eşleşmesi
- * varsa sonuç ona daraltılır (uzunluk arayan "x8" ya da "3x8" yazar).
+ * varsa sonuç ona daraltılır (uzunluk arayan "x8" ya da "8x40" yazar).
  */
-function capPuani(v: AranabilirVaryant, kelimeler: string[]): number {
+function capPuani(v: AranabilirVaryant, desenler: KelimeDeseni[]): number {
   let puan = 0;
-  for (const k of kelimeler) {
-    if (!/^\d+$/.test(k)) continue;
-    if (new RegExp(`m${k}(?!\\d)`).test(v.aranabilir)) puan += 1;
+  for (const d of desenler) {
+    if (d.cap && d.cap.test(v.aranabilir)) puan += 1;
   }
   return puan;
 }
@@ -88,18 +109,17 @@ export function filtreleVaryantlar(
   const kelimeler = kelimelereAyir(query);
   if (kelimeler.length === 0) return { items: [], capSuzuldu: false, toplam: 0 };
 
-  const eslesenler = items.filter((v) => varyantEslesir(v, kelimeler));
+  // Desenler sorgu başına BİR kez derlenir (öğe başına değil)
+  const desenler = desenleriKur(kelimeler);
+  const eslesenler = items.filter((v) => desenler.every((d) => d.eslesme.test(v.aranabilir)));
 
-  const enYuksekCap = eslesenler.reduce((max, v) => Math.max(max, capPuani(v, kelimeler)), 0);
+  const enYuksekCap = eslesenler.reduce((max, v) => Math.max(max, capPuani(v, desenler)), 0);
   const secilenler =
-    enYuksekCap > 0 ? eslesenler.filter((v) => capPuani(v, kelimeler) === enYuksekCap) : eslesenler;
+    enYuksekCap > 0 ? eslesenler.filter((v) => capPuani(v, desenler) === enYuksekCap) : eslesenler;
 
   // Norm kodu yazılmışsa o ailenin ölçüleri üstte (sort kararlı: kod sırası korunur)
-  const sirali = [...secilenler].sort((a, b) => {
-    const pa = kelimeler.some((k) => kelimeEslesir(a.normDin, k)) ? 1 : 0;
-    const pb = kelimeler.some((k) => kelimeEslesir(b.normDin, k)) ? 1 : 0;
-    return pb - pa;
-  });
+  const normEslesir = (v: AranabilirVaryant) => desenler.some((d) => d.eslesme.test(v.normDin));
+  const sirali = [...secilenler].sort((a, b) => Number(normEslesir(b)) - Number(normEslesir(a)));
 
   return {
     items: sirali.slice(0, limit),

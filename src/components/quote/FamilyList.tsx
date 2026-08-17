@@ -72,6 +72,7 @@ export function FamilyList({
                     basePath={f.image}
                     alt={f.name}
                     sizes="56px"
+                    thumb
                     className="size-full object-contain"
                   />
                 </div>

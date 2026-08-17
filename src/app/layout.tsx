@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import { AnalyticsListener } from "@/components/AnalyticsListener";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
@@ -17,10 +17,9 @@ const inter = Inter({
   subsets: ["latin", "latin-ext"],
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin", "latin-ext"],
-});
+// Not: kod/SKU metinleri için ayrı bir web fontu (JetBrains Mono) indiriliyordu —
+// her ilk ziyarette ~55 KB. Sistem monospace yığını aynı işi bedava görüyor
+// (globals.css → --font-mono).
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -37,7 +36,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="tr"
-      className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${spaceGrotesk.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <Header />

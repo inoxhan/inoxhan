@@ -88,6 +88,7 @@ export function FamilySizePanel({
             basePath={family.image}
             alt=""
             sizes="56px"
+            thumb
             className="size-full object-contain"
           />
         </div>
