@@ -20,6 +20,7 @@ import {
   quoteCustomerSchema,
   type QuoteCustomerValues,
 } from "@/lib/quote-list-schema";
+import { cn } from "@/lib/utils";
 import type { VariantIndexItem } from "@/lib/variant-search-client";
 import { submitQuoteList } from "@/server/actions/quote-list";
 import type { QuoteFamily } from "@/server/catalog";
@@ -143,8 +144,10 @@ export function QuoteBuilder({
 
   return (
     <div className="grid gap-8 lg:grid-cols-[3fr_2fr] lg:items-start">
-      {/* Sol: arama + fotoğraflı ızgara + ölçü paneli */}
-      <div>
+      {/* Sol: arama + fotoğraflı ızgara + ölçü paneli.
+          min-w-0: ızgara sütunu içeriğin doğal genişliğine büyümesin (uzun ürün
+          açıklamaları mobilde yatay kaydırma yaratıyordu) */}
+      <div className="min-w-0">
         <VariantPicker
           query={query}
           onQueryChange={setQuery}
@@ -155,7 +158,8 @@ export function QuoteBuilder({
 
         {!searching && (
           <>
-            <div className="mt-6">
+            {/* Mobilde seçim yapılınca ızgara gizlenir — panel 54 kartın altında kalmasın */}
+            <div className={cn("mt-6", secili && "hidden lg:block")}>
               <FamilyGrid families={families} selectedSku={secili?.sku ?? null} onSelect={aileSec} />
             </div>
 
@@ -216,7 +220,7 @@ export function QuoteBuilder({
       </div>
 
       {/* Sağ: liste + müşteri bilgileri (masaüstünde yapışkan) */}
-      <div id="teklif-formu" className="scroll-mt-24 lg:sticky lg:top-24">
+      <div id="teklif-formu" className="min-w-0 scroll-mt-24 lg:sticky lg:top-24">
         <QuoteCart
           items={cart.items}
           onQty={cart.setQty}

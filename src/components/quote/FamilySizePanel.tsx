@@ -1,10 +1,11 @@
 "use client";
 
-import { Check, Loader2, Plus, Search, X } from "lucide-react";
+import { ArrowLeft, Check, Loader2, Plus, Search, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ProductImage } from "@/components/catalog/ProductImage";
 import type { VariantIndex } from "@/components/quote/useVariantIndex";
 import { QUALITY_LABELS, QUALITY_OPTIONS } from "@/lib/constants";
+import { onEkiAt, ortakOnEk } from "@/lib/ortak-onek";
 import { normalizeTr } from "@/lib/slugify-tr";
 import { cn } from "@/lib/utils";
 import type { VariantIndexItem } from "@/lib/variant-search-client";
@@ -52,6 +53,9 @@ export function FamilySizePanel({
     [olculer],
   );
 
+  // Filtreden bağımsız hesaplanır ki süzerken satır etiketi değişmesin
+  const onEk = useMemo(() => ortakOnEk(olculer.map((v) => v.description)), [olculer]);
+
   const gorunen = useMemo(() => {
     const q = normalizeTr(filtre.trim());
     return olculer.filter((v) => {
@@ -66,6 +70,16 @@ export function FamilySizePanel({
       id="olcu-paneli"
       className="mt-5 scroll-mt-24 rounded-lg border-2 border-steel-950 bg-white p-4 shadow-elevated sm:p-5"
     >
+      {/* Mobilde ızgara gizlendiği için geri dönüş yolu burada durmalı */}
+      <button
+        type="button"
+        onClick={onClose}
+        className="mb-3 flex items-center gap-1.5 text-sm font-medium text-steel-500 hover:text-steel-900 lg:hidden"
+      >
+        <ArrowLeft className="size-4" aria-hidden />
+        Tüm ürünler
+      </button>
+
       <header className="flex items-start gap-3">
         <div className="size-14 shrink-0 overflow-hidden rounded-md border border-steel-100 bg-photo">
           <ProductImage
@@ -85,7 +99,7 @@ export function FamilySizePanel({
         <button
           type="button"
           onClick={onClose}
-          className="shrink-0 rounded-md p-1.5 text-steel-400 hover:bg-steel-50 hover:text-steel-700"
+          className="hidden shrink-0 rounded-md p-1.5 text-steel-400 hover:bg-steel-50 hover:text-steel-700 lg:block"
           aria-label="Ölçü panelini kapat"
         >
           <X className="size-5" />
@@ -148,6 +162,7 @@ export function FamilySizePanel({
               <SizeRow
                 key={v.code}
                 variant={v}
+                etiket={onEkiAt(v.description, onEk)}
                 added={addedCodes.has(v.code)}
                 onAdd={(qty) => onAdd(v, qty)}
               />
@@ -171,10 +186,13 @@ export function FamilySizePanel({
 
 function SizeRow({
   variant,
+  etiket,
   added,
   onAdd,
 }: {
   variant: VariantIndexItem;
+  /** Ortak ön ek atılmış kısa ad ("M8x40 A2") */
+  etiket: string;
   added: boolean;
   onAdd: (qty: number) => void;
 }) {
@@ -183,7 +201,9 @@ function SizeRow({
   return (
     <li className="flex items-center gap-3 bg-white px-3 py-2">
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm text-steel-900">{variant.description}</p>
+        <p className="text-sm font-medium break-words text-steel-900" title={variant.description}>
+          {etiket}
+        </p>
         <p className="font-mono text-xs text-steel-500">{variant.code}</p>
       </div>
       <input

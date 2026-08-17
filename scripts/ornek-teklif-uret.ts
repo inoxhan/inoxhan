@@ -65,11 +65,23 @@ async function temizle() {
 }
 
 async function uret() {
-  const varyantlar = await db.variant.findMany({
+  // Aile başına bir temsilci: rapor tabloları tek ürüne yığılmasın
+  const temsilciler = await db.variant.findMany({
     where: { isActive: true, productId: { not: null } },
     select: { id: true, code: true, productId: true },
-    take: 400,
+    distinct: ["productId"],
+    orderBy: { code: "asc" },
+    take: 20,
   });
+  // Bir ailenin birkaç ölçüsü: "en çok sorulan" satırının ölçü kırılımı dolsun
+  const ayniAile = temsilciler[0]
+    ? await db.variant.findMany({
+        where: { isActive: true, productId: temsilciler[0].productId },
+        select: { id: true, code: true, productId: true },
+        take: 4,
+      })
+    : [];
+  const varyantlar = [...temsilciler, ...ayniAile];
   if (varyantlar.length === 0) {
     console.error(
       "Varyant yok — önce `npm run import:urunler` ve `npm run import:varyantlar` çalıştırın.",
@@ -109,7 +121,7 @@ async function uret() {
     // seçilir ki "en çok sorulan" tablosu anlamlı bir sıralama göstersin
     const kalemSayisi = 1 + (i % 4);
     const kalemler: Kalem[] = Array.from({ length: kalemSayisi }, (_, j) => {
-      const v = varyantlar[(i * 3 + j * 7) % Math.min(varyantlar.length, 25)];
+      const v = varyantlar[(i * 3 + j * 7) % varyantlar.length];
       return {
         variantId: v.id,
         productId: v.productId,

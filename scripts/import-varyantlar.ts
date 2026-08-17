@@ -29,7 +29,33 @@ export const SKU_ALIAS: Record<string, string> = {
   "DIN 6798": "DIN 6798 A",
   "DIN 6885": "DIN 6885 A",
   "DIN 7505": "DIN 7505 A",
+  // İlk içe aktarım raporundan (2026-08-17): Excel harf ekini bitişik yazıyor,
+  // torks başlı vida ailesi ise sitede ISO normuyla duruyor
+  "DIN 6885A": "DIN 6885 A",
+  "DIN 7504K": "DIN 7504 K",
+  "DIN 7504N": "DIN 7504 N",
+  "DIN 7504P": "DIN 7504 P",
+  "DIN 7380": "ISO 7380",
 };
+
+/**
+ * Normu olmayan satırlar (Excel'de "DIN Normu" = "-") için açıklama anahtar
+ * kelimesinden aile eşlemesi. Dübellerin DIN normu yok; site aileleri İngilizce
+ * ticari adla duruyor (INOX Çakma Dübel = DROP IN ANCHOR).
+ */
+export const ACIKLAMA_ALIAS: { anahtar: RegExp; sku: string }[] = [
+  { anahtar: /ÇAKMA\s+DÜBEL/i, sku: "DROP IN ANCHOR" },
+  { anahtar: /ÇEKME\s+DÜBEL/i, sku: "SLEEVE ANCHOR T TYPE" },
+  { anahtar: /KLİPSLİ\s+DÜBEL/i, sku: "WEDGE ANCHOR" },
+];
+
+/** dinNorm → aile SKU; eşleşmezse açıklamadan dener. */
+export function aileSkusu(dinNorm: string, description: string): string {
+  const alias = SKU_ALIAS[dinNorm];
+  if (alias) return alias;
+  const acikla = ACIKLAMA_ALIAS.find((a) => a.anahtar.test(description));
+  return acikla ? acikla.sku : dinNorm;
+}
 
 export function normalizeSku(raw: string): string {
   return raw.trim().replace(/\s+/g, " ").toUpperCase();
@@ -106,7 +132,7 @@ async function main() {
   const eslesmeyen = new Map<string, number>(); // dinNorm → satır sayısı
 
   const cozulmus = satirlar.map((s) => {
-    const hedefSku = SKU_ALIAS[s.dinNorm] ?? s.dinNorm;
+    const hedefSku = aileSkusu(s.dinNorm, s.description);
     const productId = skuMap.get(normalizeSku(hedefSku)) ?? null;
     if (!productId) eslesmeyen.set(s.dinNorm, (eslesmeyen.get(s.dinNorm) ?? 0) + 1);
     return { ...s, productId };
