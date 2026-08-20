@@ -4,7 +4,9 @@ import { Paperclip } from "lucide-react";
 import { AutoRefresh } from "@/components/panel/AutoRefresh";
 import { ElapsedTimer } from "@/components/panel/ElapsedTimer";
 import { OutcomeBadge } from "@/components/panel/OutcomeBadge";
+import { SilButton } from "@/components/panel/SilButton";
 import { StatusBadge } from "@/components/panel/StatusBadge";
+import { deleteQuote } from "@/server/actions/panel";
 import { LOST_AFTER_HOURS, QUOTE_STATUSES, QUOTE_STATUS_LABELS } from "@/lib/constants";
 import { formatPhoneTr } from "@/lib/phone";
 import { quoteOutcome } from "@/lib/quote-outcome";
@@ -93,10 +95,11 @@ export default async function TekliflerPage({
           {quotes.map((q) => {
             const item = q.items[0];
             return (
-              <li key={q.id}>
+              // Silme düğmesi Link'in DIŞINDA: iç içe tıklanabilir öğe olmasın
+              <li key={q.id} className="flex items-stretch gap-2">
                 <Link
                   href={`/panel/teklifler/${q.id}`}
-                  className="grid grid-cols-1 items-center gap-2 rounded-lg border border-steel-200 bg-white p-4 shadow-card transition-colors hover:border-steel-400 sm:grid-cols-[2fr_2fr_auto]"
+                  className="grid min-w-0 flex-1 grid-cols-1 items-center gap-2 rounded-lg border border-steel-200 bg-white p-4 shadow-card transition-colors hover:border-steel-400 sm:grid-cols-[2fr_2fr_auto]"
                 >
                   <div className="min-w-0">
                     <p className="flex items-center gap-2 font-medium text-steel-900">
@@ -142,6 +145,13 @@ export default async function TekliflerPage({
                     />
                   </div>
                 </Link>
+                <div className="flex items-center rounded-lg border border-steel-200 bg-white px-1 shadow-card">
+                  <SilButton
+                    action={deleteQuote.bind(null, q.id)}
+                    soru={`${q.customer.name} adına gelen bu talep (${q.items.length} kalem) kalıcı olarak silinecek. Geri alınamaz. Emin misiniz?`}
+                    etiket="Talebi sil"
+                  />
+                </div>
               </li>
             );
           })}

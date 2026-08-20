@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { SilButton } from "@/components/panel/SilButton";
 import { formatPhoneTr } from "@/lib/phone";
+import { deleteCustomer } from "@/server/actions/customers";
 import { db } from "@/server/db";
 
 export default async function PanelMusterilerPage() {
@@ -25,6 +27,7 @@ export default async function PanelMusterilerPage() {
               <th className="p-3">Adres</th>
               <th className="p-3">Talep</th>
               <th className="p-3">Son Talep</th>
+              <th className="p-3 text-right">Sil</th>
             </tr>
           </thead>
           <tbody>
@@ -49,11 +52,26 @@ export default async function PanelMusterilerPage() {
                 <td className="p-3 text-steel-500">
                   {c.quotes[0]?.createdAt.toLocaleDateString("tr-TR") ?? "—"}
                 </td>
+                <td className="p-3">
+                  <div className="flex justify-end">
+                    <SilButton
+                      action={deleteCustomer.bind(null, c.id)}
+                      soru={
+                        `${c.company || c.name} kalıcı olarak silinecek` +
+                        (c._count.quotes > 0
+                          ? ` — ${c._count.quotes} teklif talebi de birlikte gidecek.`
+                          : ".") +
+                        " Geri alınamaz. Emin misiniz?"
+                      }
+                      etiket="Firmayı sil"
+                    />
+                  </div>
+                </td>
               </tr>
             ))}
             {customers.length === 0 && (
               <tr>
-                <td colSpan={6} className="p-8 text-center text-steel-400">
+                <td colSpan={7} className="p-8 text-center text-steel-400">
                   Henüz müşteri kaydı yok.
                 </td>
               </tr>

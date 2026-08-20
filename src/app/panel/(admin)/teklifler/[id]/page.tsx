@@ -4,10 +4,12 @@ import { ArrowLeft, Mail, MapPin, MessageCircle, Paperclip, Phone } from "lucide
 import { ElapsedTimer } from "@/components/panel/ElapsedTimer";
 import { OutcomeBadge } from "@/components/panel/OutcomeBadge";
 import { QuoteStatusActions } from "@/components/panel/QuoteStatusActions";
+import { SilButton } from "@/components/panel/SilButton";
 import { StatusBadge } from "@/components/panel/StatusBadge";
 import { LOST_AFTER_HOURS } from "@/lib/constants";
 import { formatPhoneTr } from "@/lib/phone";
 import { OUTCOME_HINTS, OUTCOME_LABELS, outcomeDeadline, quoteOutcome } from "@/lib/quote-outcome";
+import { deleteQuote } from "@/server/actions/panel";
 import { db } from "@/server/db";
 
 export default async function TeklifDetayPage({
@@ -211,6 +213,23 @@ export default async function TeklifDetayPage({
           &quot;Sipariş Oldu&quot; işaretleyin; {LOST_AFTER_HOURS} saat içinde işaretlenmeyen
           cevaplanmış talepler raporda &quot;Fiyat tutmadı&quot; olarak sayılır.
         </p>
+      </section>
+
+      <section className="mt-4 rounded-lg border border-status-overdue/30 bg-white p-5">
+        <h2 className="text-sm font-semibold tracking-wide text-status-overdue uppercase">
+          Kalıcı Silme
+        </h2>
+        <p className="mt-1 mb-4 text-sm text-steel-500">
+          Talep, kalemleri ve varsa ekli dosyaları veritabanından silinir; aylık rapordan
+          da düşer. Müşteri kartı kalır. Arşiv tutulmaz, kayıt geri getirilemez.
+        </p>
+        <SilButton
+          action={deleteQuote.bind(null, quote.id)}
+          soru={`${quote.customer.name} adına gelen bu talep (${quote.items.length} kalem) kalıcı olarak silinecek. Geri alınamaz. Emin misiniz?`}
+          etiket="Bu talebi sil"
+          sonrasi="/panel/teklifler"
+          genis
+        />
       </section>
     </div>
   );

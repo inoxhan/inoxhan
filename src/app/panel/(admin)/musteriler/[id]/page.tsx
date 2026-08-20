@@ -2,8 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { CustomerEditForm } from "@/components/panel/CustomerEditForm";
+import { SilButton } from "@/components/panel/SilButton";
 import { StatusBadge } from "@/components/panel/StatusBadge";
 import { formatPhoneTr } from "@/lib/phone";
+import { deleteCustomer } from "@/server/actions/customers";
 import { db } from "@/server/db";
 
 export default async function MusteriDetayPage({
@@ -93,6 +95,32 @@ export default async function MusteriDetayPage({
             <li className="py-4 text-sm text-steel-400">Henüz talebi yok.</li>
           )}
         </ul>
+      </section>
+
+      <section className="mt-4 rounded-lg border border-status-overdue/30 bg-white p-5">
+        <h2 className="text-sm font-semibold tracking-wide text-status-overdue uppercase">
+          Kalıcı Silme
+        </h2>
+        <p className="mt-1 mb-4 text-sm text-steel-500">
+          Firma kartı ve{" "}
+          {customer.quotes.length > 0
+            ? `${customer.quotes.length} teklif talebinin tamamı`
+            : "varsa tüm talepleri"}{" "}
+          veritabanından silinir. Arşiv tutulmaz, kayıt geri getirilemez.
+        </p>
+        <SilButton
+          action={deleteCustomer.bind(null, customer.id)}
+          soru={
+            `${customer.company || customer.name} kalıcı olarak silinecek` +
+            (customer.quotes.length > 0
+              ? ` — ${customer.quotes.length} teklif talebi de birlikte gidecek.`
+              : ".") +
+            " Geri alınamaz. Emin misiniz?"
+          }
+          etiket="Firmayı ve tüm taleplerini sil"
+          sonrasi="/panel/musteriler"
+          genis
+        />
       </section>
     </div>
   );

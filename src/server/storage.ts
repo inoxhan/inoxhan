@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 import { ATTACHMENT_MAX_BYTES } from "@/lib/quote-schema";
@@ -63,12 +63,46 @@ export async function saveQuoteAttachment(file: File): Promise<SaveResult> {
   }
 }
 
-/** Panel için ek dosyayı okur (auth kontrolü çağıran katmanda). */
-export async function readStoredFile(relPath: string): Promise<Buffer | null> {
-  // path traversal koruması
+/** relPath'i STORAGE_ROOT dışına çıkamayacak hâle getirir; çıkıyorsa null. */
+function guvenliYol(relPath: string): { safe: string; abs: string } | null {
   const safe = path.normalize(relPath).replace(/^([.][.][/\\])+/, "");
   const abs = path.join(STORAGE_ROOT, safe);
-  if (!abs.startsWith(STORAGE_ROOT)) return null;
+  return abs.startsWith(STORAGE_ROOT) ? { safe, abs } : null;
+}
+
+/**
+ * Teklif eki siler — panelden kalıcı silme sırasında çağrılır.
+ *
+ * Dosya kaybı talebin silinmesini engellememeli: her iki arka uçta da hata
+ * yutulur. Kalan yetim dosya, silinemeyen bir talepten daha az zararlı.
+ */
+export async function deleteStoredFile(relPath: string): Promise<void> {
+  const yol = guvenliYol(relPath);
+  if (!yol) return;
+
+  if (blobAktif()) {
+    try {
+      const { del, head } = await import("@vercel/blob");
+      // del() blob URL'i ister; DB'de pathname tutuluyor, önce URL'e çeviriyoruz
+      const meta = await head(yol.safe.replace(/\\/g, "/"));
+      await del(meta.url);
+      return;
+    } catch {
+      // Blob'da yok ya da silinemedi — diskte olabilir, aşağıda denenir
+    }
+  }
+  try {
+    await unlink(yol.abs);
+  } catch {
+    // Zaten yok
+  }
+}
+
+/** Panel için ek dosyayı okur (auth kontrolü çağıran katmanda). */
+export async function readStoredFile(relPath: string): Promise<Buffer | null> {
+  const yol = guvenliYol(relPath);
+  if (!yol) return null;
+  const { safe, abs } = yol;
   try {
     return await readFile(abs);
   } catch {
