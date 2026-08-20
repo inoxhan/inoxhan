@@ -276,6 +276,42 @@ sunucuda üretilmez (yerelde üretilip `public/katalog.pdf` olarak commit edilir
 bkz. `src/app/api/katalog.pdf/route.ts`); dosya ekleri `BLOB_READ_WRITE_TOKEN`
 varsa Vercel Blob'a yazılır (`src/server/storage.ts`).
 
+**Fonksiyon bölgesi `fra1` OLMALI** (`vercel.json` → `regions`). Neon veritabanı
+`eu-central-1` (Frankfurt); fonksiyon Vercel'in varsayılan `iad1` (Washington DC)
+bölgesinde çalışırsa her sorgu Atlantik'i geçer. Ölçüldü: `iad1` iken
+`/urunler` **1741 ms**, önbelleğe düşen ürün sayfası **98 ms**. `x-vercel-id`
+başlığındaki ikinci alan çalışan bölgeyi verir (`fra1::iad1::…` = yanlış).
+
+## Performans
+
+Ölçüm aracı: `tsx tmp/olcum.ts` benzeri Playwright betiği (kalıcı değil) ya da
+tarayıcı ağ sekmesi. 20 Ağustos 2026 canlı ölçümü (masaüstü, soğuk önbellek):
+
+| Sayfa | TTFB | LCP | Toplam | Not |
+|---|---|---|---|---|
+| `/urunler/[kategori]/[slug]` | 98 ms | 700 ms | 1.142 KB | SSG — hedef bu |
+| `/` | 359 ms | 3.316 ms | 2.192 KB | 806 KB hero videosu |
+| `/teklif` | 1.359 ms | 2.392 ms | 1.544 KB | 995 KB JS |
+| `/urunler` | 1.741 ms | 2.016 ms | 1.620 KB | 188 KB HTML |
+
+Bilinen ağırlıklar ve durumları:
+
+- **Fonksiyon bölgesi** — düzeltildi (`vercel.json`, yukarı bakın). Dinamik
+  sayfalardaki TTFB'nin büyük kısmı buydu.
+- **three.js / @react-three (941 KB derleme parçası)** — `HeroMedia` yalnız
+  `media.kind === "3d"` slaytında `Hero3D`'yi boyar ve `HERO_SLIDES` içinde
+  öyle bir slayt YOK. `next/dynamic` + `ssr:false` sayesinde tarayıcıya
+  **inmiyor** (ağ ölçümünde yok), ama depoda/derlemede duruyor. 3D hero
+  planlanmıyorsa `three`, `@react-three/fiber`, `@react-three/drei`
+  bağımlılıkları ve `Hero3D`/`HeroScene` silinebilir.
+- **Fontlar (171 KB, 4 dosya, her sayfada)** — Inter + Space Grotesk, ikisi de
+  `latin` + `latin-ext`. Türkçe (ş, ğ, ı, İ) `latin-ext` istediği için subset
+  kırpılamaz; tek aileye inmek tasarım kararıdır.
+- **Hero videosu (806 KB)** — açılışı takmasın diye `requestIdleCallback` ile
+  erteleniyor, yine de ana sayfanın en ağır tek dosyası.
+- **RSC ön yüklemesi** — `/urunler`'de 32 ek istek / 257 KB. Ürün kartlarında
+  `<Link prefetch={false}>` bunu keser; karşılığında gezinme biraz yavaşlar.
+
 ## GitHub Pages (statik vitrin)
 
 `npm run derle:statik` → `out/` klasörünü üretir → içeriği `gh-pages` dalına itilir →
