@@ -19,6 +19,7 @@
     "import:sample": "tsx scripts/make-sample-import.ts",
     "ornek:teklif": "tsx scripts/ornek-teklif-uret.ts",
     "smoke:teklif": "tsx scripts/smoke-teklif.ts",
+    "test:mail": "tsx scripts/test-mail.ts",
     "hazirla:logo": "tsx scripts/hazirla-logo.ts",
     "hazirla:kucuk": "tsx scripts/hazirla-kucuk-gorsel.ts",
     "hazirla:hero": "tsx scripts/hazirla-hero.ts",

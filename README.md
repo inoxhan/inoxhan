@@ -214,12 +214,67 @@ girmez — yalnız web sayfasında, tam çözünürlükte "Büyüt" bağlantıs�
 
 ## Bildirimler
 
-- **E-posta:** `.env` içinde `SMTP_*` ve `NOTIFY_EMAIL` doldurulunca aktif olur
-  (boşken e-postalar konsola yazılır).
+- **E-posta — kanal seçimi** (`kanalSec`, `src/server/email.ts`): `RESEND_API_KEY`
+  doluysa **Resend HTTP API**, değilse `SMTP_HOST` doluysa **SMTP**, ikisi de
+  boşsa **dev modu** (gönderim yok, içerik konsola yazılır). Ayar değiştirdikten
+  sonra `npm run test:mail` ile doğrulayın — script hangi kanal seçildiğini,
+  gerçek alıcıyı ve hatanın Türkçe açıklamasını basar.
+- **Resend (yürürlükteki kanal):** `RESEND_API_KEY` (resend.com > API Keys) +
+  `SMTP_FROM=info@inoxhan.com`. Gönderenin alan adı Resend'de **doğrulanmış**
+  olmalı; DNS kayıtları Squarespace'te tutuluyor (`inoxhan.com` NS kayıtları
+  `*.squarespacedns.com`). Resend'in eklediği kayıtlar `send.inoxhan.com` alt
+  alanı ve `resend._domainkey` üzerinde olduğu için kök alandaki Google Workspace
+  MX kaydına (`smtp.google.com`) dokunmaz — gelen posta etkilenmez.
+- **Neden SMTP değil:** Google Workspace hesabında uygulama şifresi üretilemiyor
+  (yönetici ayarı kapalı), `smtp-relay.gmail.com` ise sabit IP istiyor; Vercel'in
+  çıkış IP'si sabit değil. SMTP alanları yedek kanal olarak kodda duruyor.
+- **Kişisel Gmail kullanılmaz.** Site yalnız kurumsal kimliğinden gönderir;
+  `npm run test:mail`, `SMTP_FROM` (veya `SMTP_USER`) bir `@gmail.com` adresiyse
+  çalışmayı reddeder.
+- **Alıcı:** `NOTIFY_EMAIL` (virgülle birden çok adres) yalnız **yedek** değerdir.
+  `Setting` tablosundaki `notify_email` satırı doluysa **o kazanır** (`getSetting`
+  önce veritabanına bakar) ve bu satırı düzenleyecek bir panel ekranı **henüz yok** —
+  ortam değişkenini değiştirip "neden hâlâ eski adrese gidiyor" diye aramamak için
+  önce veritabanına bakın:
+  `npx prisma studio` → `Setting` → `notify_email`. Şu anki değer `info@inoxhan.com`.
+  Statik sürümde müşteriye gösterilen adres ayrı bir değişkendir
+  (`PUBLIC_QUOTE_EMAIL`), çünkü o değer herkese açık HTML'e gömülür.
 - **WhatsApp:** `WHATSAPP_NUMBER` (biçim: `9053XXXXXXXX`) girilince sitedeki tüm
   WhatsApp butonları görünür olur.
 - **CRM:** `CRM_WEBHOOK_URL` + `CRM_WEBHOOK_SECRET` girilince her teklif HMAC-SHA256
   imzalı JSON olarak POST edilir (`x-inoxhan-signature` başlığı).
+
+Bildirimler `Promise.allSettled` içinde çalışır: e-posta patlasa bile teklif
+veritabanına yazılmış olur ve panelde görünür — talep kaybolmaz.
+
+## Vercel (sunucu sürümü — asıl yayın)
+
+E-posta bildirimi, yönetim paneli, veritabanı kaydı ve fotoğraflı teklif
+oluşturucu **yalnız sunucu sürümünde** çalışır. GitHub Pages sürümü sunucu
+çalıştırmadığı için teklif formu ziyaretçinin kendi posta programını açan bir
+`mailto:` bağlantısına düşer — o akışta size hiçbir zaman otomatik mail gelmez.
+
+1. [vercel.com/new](https://vercel.com/new) → `inoxhan/inoxhan` deposunu içe aktarın.
+   Framework otomatik "Next.js" gelir, build ayarlarına dokunmayın
+   (`postinstall` zaten `prisma generate` çalıştırır).
+2. **Environment Variables** (Production + Preview): `DATABASE_URL`, `DIRECT_URL`,
+   `SESSION_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `RESEND_API_KEY`,
+   `SMTP_FROM`, `NOTIFY_EMAIL`, `CATALOG_PRINT_TOKEN`,
+   `NEXT_PUBLIC_SITE_URL` (gerçek alan adı — QR kodlar ve SEO bunu kullanır).
+   İsteğe bağlı: `WHATSAPP_NUMBER`, `CRM_WEBHOOK_*`, `BLOB_READ_WRITE_TOKEN`.
+   - `STATIC_EXPORT` ve `NEXT_PUBLIC_STATIC` **tanımlanmamalı** — tanımlanırsa
+     Vercel de statik sürümü derler ve sorun aynen sürer.
+   - `SITE_PASSWORD` **doluysa** site parola penceresiyle kapalı kalır
+     (`src/proxy.ts`); herkese açmak için değişkeni hiç eklemeyin ya da silin.
+3. Veritabanı zaten Neon'da; ilk dağıtımdan sonra migration için
+   `npx prisma migrate deploy` (yerelden `DIRECT_URL` ile) yeterlidir.
+4. Dağıtım sonrası `/teklif` üzerinden gerçek bir talep gönderip Vercel
+   günlüklerinde `Teklif #... e-postası gönderildi` satırını arayın.
+
+Vercel'de bilinçli sınırlar: dosya sistemi salt okunur olduğu için katalog PDF'i
+sunucuda üretilmez (yerelde üretilip `public/katalog.pdf` olarak commit edilir,
+bkz. `src/app/api/katalog.pdf/route.ts`); dosya ekleri `BLOB_READ_WRITE_TOKEN`
+varsa Vercel Blob'a yazılır (`src/server/storage.ts`).
 
 ## GitHub Pages (statik vitrin)
 

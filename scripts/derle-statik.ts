@@ -150,8 +150,11 @@ async function main() {
         NEXT_PUBLIC_BASE_PATH: BASE_PATH,
         NEXT_PUBLIC_SITE_URL: SITE_URL,
         NEXT_PUBLIC_WHATSAPP_NUMBER: envDosyasindanOku("WHATSAPP_NUMBER"),
+        // DİKKAT: burası herkese açık HTML'e gömülür. Bilerek NOTIFY_EMAIL'den
+        // ayrıldı — o kutu artık kişisel bir Gmail olabilir; müşteriye gösterilen
+        // adres her zaman kurumsal olan kalsın.
         NEXT_PUBLIC_QUOTE_EMAIL:
-          envDosyasindanOku("NOTIFY_EMAIL") || "info@inoxhan.com",
+          envDosyasindanOku("PUBLIC_QUOTE_EMAIL") || "info@inoxhan.com",
       },
     });
     if (sonuc.status !== 0) throw new Error(`next build başarısız (kod ${sonuc.status})`);
