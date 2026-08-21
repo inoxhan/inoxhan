@@ -18,13 +18,39 @@ const PRINT_CSS = `
   body:has(#katalog-baski) .no-print { display: none !important; }
   body:has(#katalog-baski) { background: white !important; }
 
+  /* @page marjı 0 KALMALI: kapak kâğıdın tamamını kaplıyor. Kenar boşluğunu
+     elemanların padding'i üretir. (margin: 14mm 13mm + adlandırılmış @page ve
+     negatif margin denendi — Chromium ikisinde de kapağı 184mm'de tutup
+     sağ/alt kenarda beyaz şerit bıraktı.) */
   @page { size: A4 portrait; margin: 0; }
+
   #katalog-baski { font-size: 10.5pt; color: #14181D; }
 
-  .pdf-page { width: 210mm; min-height: 297mm; padding: 14mm 13mm; box-sizing: border-box; page-break-after: always; }
-  .pdf-cover { display: flex; flex-direction: column; justify-content: space-between; background: #0B0D10; color: #F5F7F8; }
-  .pdf-section-head { background: #14181D; color: #F5F7F8; }
+  /* Tam sayfa tutulan bölümler: kapak ve içindekiler */
+  .pdf-sheet { width: 210mm; min-height: 297mm; padding: 14mm 13mm; box-sizing: border-box; page-break-after: always; }
+  .pdf-cover {
+    display: flex; flex-direction: column; justify-content: space-between;
+    background: #0B0D10; color: #F5F7F8;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+
+  /* Kategoriler TEK akış: her biri ayrı .pdf-page olduğunda 2-4 ürünlü
+     kategoriler yarısı boş sayfa üretiyordu ("katalog bitmiş gibi"). Sarmalayıcı
+     genişliği vermek şart — yoksa ürün satırının sağındaki QR sütunu (flexShrink: 0)
+     sayfa dışına taşıp kırpılıyor. */
+  .pdf-flow { width: 210mm; padding: 14mm 13mm; box-sizing: border-box; }
+  .pdf-category { break-inside: auto; }
+  .pdf-section-head {
+    background: #14181D; color: #F5F7F8;
+    break-after: avoid; page-break-after: avoid;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  /* Akış içinde kategoriler birbirine yapışmasın; ilki başlıktan sonra gelir */
+  .pdf-category + .pdf-category .pdf-section-head { margin-top: 10mm; }
+
   .pdf-product { break-inside: avoid; page-break-inside: avoid; }
+  /* Sayfa dibindeki son ürünün alt çizgisi havada kalmasın */
+  .pdf-product:last-child { border-bottom: none; }
 `;
 
 interface SearchParams {
@@ -80,7 +106,7 @@ export default async function KatalogBaskiPage({
       <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
 
       {/* ── KAPAK ── */}
-      <section className="pdf-page pdf-cover">
+      <section className="pdf-sheet pdf-cover">
         <div style={{ paddingTop: "24mm" }}>
           {/* Saydam zeminli kurumsal logo — koyu kapak üzerinde metalik okunur.
               display:block şart: satır içi <img> taban çizgisi boşluğu ekliyor ve
@@ -123,7 +149,7 @@ export default async function KatalogBaskiPage({
       </section>
 
       {/* ── İÇİNDEKİLER ── */}
-      <section className="pdf-page">
+      <section className="pdf-sheet">
         <h2 className="font-display" style={{ fontSize: "20pt", fontWeight: 700, marginBottom: "10mm" }}>
           İçindekiler
         </h2>
@@ -155,9 +181,10 @@ export default async function KatalogBaskiPage({
         </p>
       </section>
 
-      {/* ── KATEGORİLER ── */}
+      {/* ── KATEGORİLER — tek sürekli akış, aralarda boş sayfa bırakmaz ── */}
+      <div className="pdf-flow">
       {withProducts.map((cat, ci) => (
-        <section key={cat.id} className="pdf-page">
+        <section key={cat.id} className="pdf-category">
           <div
             className="pdf-section-head"
             style={{ padding: "6mm 8mm", borderRadius: "3mm", marginBottom: "8mm", display: "flex", justifyContent: "space-between", alignItems: "baseline" }}
@@ -258,6 +285,7 @@ export default async function KatalogBaskiPage({
           ))}
         </section>
       ))}
+      </div>
     </div>
   );
 }

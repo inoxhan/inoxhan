@@ -53,6 +53,30 @@ export async function getLatestCatalogFile(): Promise<{
   return stats[0];
 }
 
+/**
+ * İndirilebilir katalog — sayfa ve API rotası AYNI kaynağa baksın diye ortak.
+ *
+ * Panelden üretilen storage/ kopyası önceliklidir (Node sunucu / VPS). Vercel'de
+ * kalıcı disk olmadığı için orası hep boştur; depoya commit edilen
+ * public/katalog.pdf devreye girer. İkisi ayrı ayrı kontrol edildiğinde
+ * /katalog sayfası "hazırlanıyor" derken /api/katalog.pdf indirme veriyordu.
+ */
+export async function getCatalogForDownload(): Promise<{
+  absPath: string;
+  sizeBytes: number;
+} | null> {
+  const uretilen = await getLatestCatalogFile();
+  if (uretilen) return { absPath: uretilen.absPath, sizeBytes: uretilen.sizeBytes };
+
+  const yedek = path.join(process.cwd(), "public", "katalog.pdf");
+  try {
+    const s = await stat(yedek);
+    return { absPath: yedek, sizeBytes: s.size };
+  } catch {
+    return null;
+  }
+}
+
 /** Üretimi başlatır; çağıran await ETMEZ (fire-and-forget). */
 export async function runCatalogGeneration(): Promise<void> {
   const current = await getCatalogStatus();

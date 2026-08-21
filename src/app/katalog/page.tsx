@@ -4,7 +4,7 @@ import { BookOpen, Download, Zap } from "lucide-react";
 import { KatalogVideo } from "@/components/catalog/KatalogVideo";
 import { buttonStyles } from "@/components/ui/Button";
 import { asset, IS_STATIC } from "@/lib/asset";
-import { getLatestCatalogFile } from "@/server/catalog-pdf";
+import { getCatalogForDownload } from "@/server/catalog-pdf";
 import { videoVar } from "@/server/sayfa-medya";
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/katalog" },
 };
 
-// Son üretilen kataloğu her istekte diskten kontrol eder
+// Kataloğu her istekte diskten kontrol eder (panelden yeni sürüm üretilebilir)
 export const dynamic = "force-dynamic";
 
 function fmtSize(bytes: number): string {
@@ -23,7 +23,7 @@ function fmtSize(bytes: number): string {
 }
 
 export default async function KatalogPage() {
-  const latest = await getLatestCatalogFile();
+  const latest = await getCatalogForDownload();
   // Arka plan videosu üretilmemişse bant düz koyu kalır — sayfa her aşamada çalışır
   const video = videoVar("media/video/katalog-duvar");
 
